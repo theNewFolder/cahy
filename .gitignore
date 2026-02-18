@@ -1,0 +1,9 @@
+result
+.direnv
+*.swp
+*~
+.env
+
+# Never commit actual secrets
+.secrets/
+!secrets/README.md
