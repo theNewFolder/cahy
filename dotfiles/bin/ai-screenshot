@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Screenshot + AI analysis — take a screenshot and have AI describe/analyze it
+set -euo pipefail
+
+TMPFILE="/tmp/ai-screenshot-$(date +%s).png"
+
+# Take screenshot of selected area
+grim -g "$(slurp)" "$TMPFILE" 2>/dev/null
+
+if [[ ! -f "$TMPFILE" ]]; then
+    notify-send "AI Screenshot" "Screenshot cancelled"
+    exit 0
+fi
+
+notify-send "AI Screenshot" "Analyzing..." -t 2000
+
+# Use claude for vision (gemini can also work)
+if command -v claude &>/dev/null; then
+    RESPONSE=$(claude -p "Describe what you see in this screenshot concisely." --image "$TMPFILE" 2>&1 | head -20)
+else
+    RESPONSE="Install claude CLI for screenshot analysis"
+fi
+
+notify-send "AI Analysis" "$RESPONSE" -t 15000
+rm -f "$TMPFILE"

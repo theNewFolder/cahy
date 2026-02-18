@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
-# AI process status for waybar custom module
-# Shows running claude/gemini sessions
+# AI process status for waybar — shows running Claude/Gemini/Agent sessions
 
-CLAUDE_COUNT=$(pgrep -c -f "claude" 2>/dev/null || echo 0)
-GEMINI_COUNT=$(pgrep -c -f "gemini" 2>/dev/null || echo 0)
-TOTAL=$((CLAUDE_COUNT + GEMINI_COUNT))
+CLAUDE_COUNT=$(pgrep -c -f "claude" 2>/dev/null || true)
+GEMINI_COUNT=$(pgrep -c -f "gemini" 2>/dev/null || true)
+AGENT_COUNT=$(pgrep -c -f "agents/.*/server" 2>/dev/null || true)
+CLAUDE_COUNT=${CLAUDE_COUNT:-0}
+GEMINI_COUNT=${GEMINI_COUNT:-0}
+AGENT_COUNT=${AGENT_COUNT:-0}
+TOTAL=$(( CLAUDE_COUNT + GEMINI_COUNT + AGENT_COUNT ))
 
 if [ "$TOTAL" -gt 0 ]; then
-  TOOLTIP="Claude: $CLAUDE_COUNT sessions\nGemini: $GEMINI_COUNT sessions"
-  echo "{\"text\": \"🤖 $TOTAL\", \"tooltip\": \"$TOOLTIP\", \"class\": \"active\"}"
+    PARTS=""
+    [ "$CLAUDE_COUNT" -gt 0 ] && PARTS="Claude: $CLAUDE_COUNT"
+    [ "$GEMINI_COUNT" -gt 0 ] && PARTS="${PARTS:+$PARTS\\n}Gemini: $GEMINI_COUNT"
+    [ "$AGENT_COUNT" -gt 0 ] && PARTS="${PARTS:+$PARTS\\n}Agents: $AGENT_COUNT"
+    echo "{\"text\": \"󰧑 $TOTAL\", \"tooltip\": \"$PARTS\", \"class\": \"active\"}"
 else
-  echo "{\"text\": \"🤖\", \"tooltip\": \"No AI sessions\", \"class\": \"idle\"}"
+    echo "{\"text\": \"󰧑\", \"tooltip\": \"No AI sessions\\nSuper+I: Gemini\\nSuper+Shift+I: Claude\\nCtrl+Super+T: Agent Team\\nCtrl+Super+L: Quick Learn\", \"class\": \"idle\"}"
 fi

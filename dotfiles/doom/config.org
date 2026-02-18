@@ -21,10 +21,30 @@
       doom-big-font (font-spec :family "DankMono Nerd Font" :size 20)
       doom-serif-font (font-spec :family "Noto Serif" :size 14))
 
-;; Italic comments and keywords (from DistroTube's config)
+;; Gruvbox-harmonized face overrides
 (custom-set-faces!
+  ;; Italic comments and keywords (from DistroTube's config)
   '(font-lock-comment-face :slant italic)
-  '(font-lock-keyword-face :slant italic))
+  '(font-lock-keyword-face :slant italic)
+
+  ;; Org heading sizes (scaled for visual hierarchy)
+  '(org-level-1 :height 1.3 :weight bold)
+  '(org-level-2 :height 1.15 :weight bold)
+  '(org-level-3 :height 1.05 :weight semi-bold)
+  '(org-level-4 :height 1.0 :weight semi-bold)
+
+  ;; Better org-block styling
+  '(org-block :background "#1d2021")
+  '(org-block-begin-line :background "#1d2021" :foreground "#928374" :slant italic)
+  '(org-block-end-line :background "#1d2021" :foreground "#928374" :slant italic)
+
+  ;; Org document info
+  '(org-document-title :height 1.4 :weight bold :foreground "#fabd2f")
+  '(org-document-info :foreground "#83a598" :slant italic)
+
+  ;; Line numbers (dimmer for less distraction)
+  '(line-number :foreground "#504945")
+  '(line-number-current-line :foreground "#fabd2f" :weight bold))
 
 ;; Line numbers (relative for evil motions, disabled in org/term)
 (setq display-line-numbers-type 'relative)
@@ -60,54 +80,119 @@
         org-ellipsis " ▾"
         org-hide-emphasis-markers t
         org-return-follows-link t
-        org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "IN-PROGRESS(i)" "WAITING(w@)" "|" "DONE(d)" "CANCELLED(c@)"))
-        org-todo-keyword-faces '(("TODO" . (:foreground "#fabd2f" :weight bold))
-                                 ("NEXT" . (:foreground "#83a598" :weight bold))
-                                 ("IN-PROGRESS" . (:foreground "#fe8019" :weight bold))
-                                 ("WAITING" . (:foreground "#d3869b" :weight bold))
-                                 ("DONE" . (:foreground "#b8bb26" :weight bold))
-                                 ("CANCELLED" . (:foreground "#928374" :weight bold)))))
+
+        ;; Two-sequence TODO workflow (SystemCrafters): tasks + projects
+        org-todo-keywords
+        '((sequence "TODO(t)" "NEXT(n)" "IN-PROGRESS(i)" "WAITING(w@/!)" "|" "DONE(d!)" "CANCELLED(c@)")
+          (sequence "PROJECT(P)" "ACTIVE(a)" "REVIEW(v)" "HOLD(h)" "|" "COMPLETED(C!)" "SHELVED(s@)"))
+
+        org-todo-keyword-faces
+        '(("TODO"        . (:foreground "#fabd2f" :weight bold))
+          ("NEXT"        . (:foreground "#83a598" :weight bold))
+          ("IN-PROGRESS" . (:foreground "#fe8019" :weight bold))
+          ("WAITING"     . (:foreground "#d3869b" :weight bold))
+          ("HOLD"        . (:foreground "#928374" :weight bold))
+          ("ACTIVE"      . (:foreground "#8ec07c" :weight bold))
+          ("PROJECT"     . (:foreground "#d3869b" :weight bold))
+          ("REVIEW"      . (:foreground "#d3869b" :weight bold))
+          ("DONE"        . (:foreground "#b8bb26" :weight bold))
+          ("COMPLETED"   . (:foreground "#b8bb26" :weight bold))
+          ("CANCELLED"   . (:foreground "#928374" :weight bold :strike-through t))
+          ("SHELVED"     . (:foreground "#928374" :slant italic)))
+
+        ;; Refile targets (critical for inbox processing)
+        org-refile-targets '(("~/org/tasks.org" :maxlevel . 2)
+                              ("~/org/projects.org" :maxlevel . 3)
+                              ("~/org/someday.org" :maxlevel . 2)
+                              ("~/org/reference.org" :maxlevel . 2)
+                              ("~/org/archive.org" :maxlevel . 1))
+        org-refile-use-outline-path 'file
+        org-outline-path-complete-in-steps nil
+        org-refile-allow-creating-parent-nodes 'confirm
+
+        ;; Archive to datetree
+        org-archive-location "~/org/archive.org::datetree/"))
 #+end_src
 
-** Org Superstar
+** Org Modern (replaces org-superstar — cleaner, more comprehensive)
 #+begin_src emacs-lisp
-(after! org-superstar
-  (setq org-superstar-headline-bullets-list '("◉" "○" "✸" "✿" "◆" "●" "►")
-        org-superstar-prettify-item-bullets t))
+(use-package! org-modern
+  :hook (org-mode . org-modern-mode)
+  :config
+  (setq org-modern-star '("◉" "○" "✸" "✿" "◆" "●" "►")
+        org-modern-table-vertical 1
+        org-modern-table-horizontal 0.2
+        org-modern-list '((43 . "➤") (45 . "–") (42 . "•"))
+        org-modern-todo-faces
+        '(("TODO"        :background "#fabd2f" :foreground "#1d2021" :weight bold)
+          ("NEXT"        :background "#83a598" :foreground "#1d2021" :weight bold)
+          ("IN-PROGRESS" :background "#fe8019" :foreground "#1d2021" :weight bold)
+          ("WAITING"     :background "#d3869b" :foreground "#1d2021" :weight bold)
+          ("DONE"        :background "#b8bb26" :foreground "#1d2021" :weight bold)
+          ("CANCELLED"   :background "#928374" :foreground "#1d2021" :weight bold)
+          ("PROJECT"     :background "#d3869b" :foreground "#1d2021" :weight bold)
+          ("ACTIVE"      :background "#8ec07c" :foreground "#1d2021" :weight bold))
+        org-modern-block-fringe nil
+        org-modern-keyword nil
+        org-modern-timestamp t
+        org-modern-progress nil))
 #+end_src
 
 ** Capture Templates
 #+begin_src emacs-lisp
 (after! org
   (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline "~/org/tasks.org" "Inbox")
+        '(;; === Quick Capture ===
+          ("i" "Inbox" entry (file "~/org/inbox.org")
+           "* TODO %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n%i"
+           :prepend t :empty-lines 1)
+
+          ;; === Tasks ===
+          ("t" "Task" entry (file+headline "~/org/tasks.org" "Inbox")
            "* TODO %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n%i" :prepend t)
 
-          ("n" "Note" entry (file "~/org/notes.org")
-           "* %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n%i")
+          ("T" "Task with link" entry (file+headline "~/org/tasks.org" "Inbox")
+           "* TODO %?\n:PROPERTIES:\n:CREATED: %U\n:CONTEXT: %a\n:END:\n%i" :prepend t)
 
+          ;; === Notes ===
+          ("n" "Note" entry (file "~/org/notes.org")
+           "* %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n%i" :empty-lines 1)
+
+          ;; === Journal ===
           ("j" "Journal" entry (file+olp+datetree "~/org/journal.org")
            "* %<%I:%M %p> %?\n%i" :tree-type week)
 
-          ("i" "Idea" entry (file "~/org/ideas.org")
-           "* IDEA %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n%i")
-
+          ;; === Project ===
           ("p" "Project" entry (file "~/org/projects.org")
-           "* PROJECT %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n** Goals\n** Tasks\n** Notes")
+           "* PROJECT %? :Project:\n:PROPERTIES:\n:CREATED: %U\n:CATEGORY: %^{Category}\n:END:\n** Description\n\n** Goals\n- [ ] \n\n** Tasks\n*** TODO \n\n** Notes\n"
+           :empty-lines 1)
 
+          ;; === Meeting ===
           ("m" "Meeting" entry (file "~/org/meetings.org")
-           "* MEETING %? :meeting:\n:PROPERTIES:\n:DATE: %U\n:END:\n** Attendees\n** Notes\n** Action Items")
+           "* MEETING %? :meeting:\n:PROPERTIES:\n:DATE: %U\n:ATTENDEES:\n:END:\n** Agenda\n\n** Notes\n\n** Action Items\n- [ ] "
+           :clock-in t :clock-resume t)
 
+          ;; === Learning ===
           ("l" "Learning" entry (file "~/org/learning.org")
-           "* LEARN %?\n:PROPERTIES:\n:CREATED: %U\n:SOURCE:\n:END:\n** Key Points\n** Questions\n** Practice")
+           "* LEARN %?\n:PROPERTIES:\n:CREATED: %U\n:SOURCE: %^{Source}\n:END:\n** Key Points\n\n** Questions\n\n** Practice\n")
 
+          ;; === Web / Link Capture ===
           ("w" "Web Capture" entry (file "~/org/inbox.org")
-           "* %:description\n:PROPERTIES:\n:URL: %:link\n:CREATED: %U\n:END:\n%:initial\n%?"))))
+           "* %:description\n:PROPERTIES:\n:URL: %:link\n:CREATED: %U\n:END:\n%:initial\n%?" :prepend t)
+
+          ;; === Code Snippet ===
+          ("s" "Code Snippet" entry (file "~/org/snippets.org")
+           "* %^{Description}\n:PROPERTIES:\n:CREATED: %U\n:LANGUAGE: %^{Language|emacs-lisp|python|rust|javascript|shell}\n:END:\n#+begin_src %\\3\n%?\n#+end_src\n"))))
 #+end_src
 
 ** Agenda
 #+begin_src emacs-lisp
 (after! org
+  ;; Org-habit support
+  (add-to-list 'org-modules 'org-habit t)
+  (setq org-habit-graph-column 60
+        org-habit-show-habits-only-for-today t)
+
   (setq org-agenda-files '("~/org/tasks.org"
                             "~/org/projects.org"
                             "~/org/meetings.org"
@@ -119,18 +204,58 @@
 
         org-agenda-custom-commands
         '(("d" "Dashboard"
-           ((agenda "" ((org-agenda-span 'day)))
+           ((agenda "" ((org-agenda-span 'day)
+                        (org-deadline-warning-days 7)))
             (todo "NEXT" ((org-agenda-overriding-header "Next Actions")))
             (todo "IN-PROGRESS" ((org-agenda-overriding-header "In Progress")))
-            (todo "WAITING" ((org-agenda-overriding-header "Waiting")))))
+            (todo "WAITING" ((org-agenda-overriding-header "Waiting On")))
+            (tags "inbox" ((org-agenda-overriding-header "Inbox (Unprocessed)")))))
 
           ("n" "Next Actions"
            ((todo "NEXT" ((org-agenda-overriding-header "All Next Actions")))))
 
+          ("p" "Projects"
+           ((todo "PROJECT" ((org-agenda-overriding-header "Active Projects")))
+            (todo "ACTIVE" ((org-agenda-overriding-header "Active Tasks")))))
+
           ("w" "Weekly Review"
            ((agenda "" ((org-agenda-span 'week)))
             (todo "DONE" ((org-agenda-overriding-header "Completed This Week")))
-            (todo "TODO" ((org-agenda-overriding-header "Remaining TODOs"))))))))
+            (todo "TODO" ((org-agenda-overriding-header "Remaining TODOs")))
+            (todo "WAITING" ((org-agenda-overriding-header "Still Waiting")))))
+
+          ("h" "Habits" tags-todo "STYLE=\"habit\""
+           ((org-agenda-overriding-header "Active Habits")
+            (org-agenda-sorting-strategy '(todo-state-down effort-up category-keep)))))))
+#+end_src
+
+** Dynamic Agenda from Org-Roam (SystemCrafters: 5 Org Roam Hacks)
+#+begin_src emacs-lisp
+;; Dynamically add org-roam Project-tagged notes to agenda
+(defun my/org-roam-filter-by-tag (tag-name)
+  "Filter org-roam nodes by TAG-NAME."
+  (lambda (node)
+    (member tag-name (org-roam-node-tags node))))
+
+(defun my/org-roam-list-notes-by-tag (tag-name)
+  "Return list of org-roam file paths with TAG-NAME."
+  (mapcar #'org-roam-node-file
+          (seq-filter
+           (my/org-roam-filter-by-tag tag-name)
+           (org-roam-node-list))))
+
+(defun my/org-roam-refresh-agenda-list ()
+  "Rebuild org-agenda-files from org-roam Project-tagged notes."
+  (interactive)
+  (setq org-agenda-files
+        (delete-dups
+         (append
+          '("~/org/tasks.org" "~/org/inbox.org" "~/org/habits.org"
+            "~/org/projects.org" "~/org/meetings.org")
+          (my/org-roam-list-notes-by-tag "Project")))))
+
+;; Build agenda list on startup
+(add-hook 'doom-after-init-hook #'my/org-roam-refresh-agenda-list)
 #+end_src
 
 ** Org-Roam
@@ -139,20 +264,53 @@
   (setq org-roam-directory "~/org/roam"
         org-roam-dailies-directory "daily/"
         org-roam-completion-everywhere t
+
+        ;; Show tags in node search (SystemCrafters)
+        org-roam-node-display-template
+        (concat "${title:*} " (propertize "${tags:20}" 'face 'org-tag))
+
+        ;; Expanded capture templates (Zettelkasten-style)
         org-roam-capture-templates
-        '(("d" "default" plain "%?"
+        '(;; Default note
+          ("d" "default" plain "%?"
            :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
                               "#+title: ${title}\n#+created: %U\n#+filetags:\n\n")
            :unnarrowed t)
+
+          ;; Concept / Evergreen note (permanent Zettelkasten note)
+          ("c" "concept" plain "%?"
+           :target (file+head "concepts/%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+created: %U\n#+filetags: :concept:\n\n* Definition\n\n* Key Points\n\n* Connections\n\n")
+           :unnarrowed t)
+
+          ;; Reference / Literature note
           ("r" "reference" plain "%?"
            :target (file+head "reference/%<%Y%m%d%H%M%S>-${slug}.org"
-                              "#+title: ${title}\n#+created: %U\n#+filetags: :reference:\n\n* Source\n\n* Notes\n\n")
+                              "#+title: ${title}\n#+created: %U\n#+filetags: :reference:\n\n* Source\n- Author: %^{Author}\n- URL/ISBN: %^{Source}\n\n* Summary\n\n* Key Ideas\n\n")
+           :unnarrowed t)
+
+          ;; Project note (integrates with agenda via :Project: tag)
+          ("p" "project" plain "%?"
+           :target (file+head "projects/%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+created: %U\n#+filetags: :Project:\n\n* Description\n\n* Goals\n- [ ] \n\n* Tasks\n** TODO \n\n* Log\n\n")
+           :unnarrowed t)
+
+          ;; Tool / Technology
+          ("t" "tool" plain "%?"
+           :target (file+head "tools/%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+created: %U\n#+filetags: :tool:\n\n* What\n\n* Why\n\n* How\n\n* Config\n#+begin_src \n\n#+end_src\n\n")
            :unnarrowed t))
 
+        ;; Enhanced daily templates
         org-roam-dailies-capture-templates
         '(("d" "default" entry "* %<%I:%M %p> %?"
            :target (file+head "%<%Y-%m-%d>.org"
-                              "#+title: %<%Y-%m-%d %A>\n\n")))))
+                              "#+title: %<%Y-%m-%d %A>\n#+filetags: :daily:\n\n* Morning Plan\n\n* Log\n\n* Reflections\n\n"))
+
+          ("t" "task" entry "* TODO %?"
+           :target (file+head "%<%Y-%m-%d>.org"
+                              "#+title: %<%Y-%m-%d %A>\n#+filetags: :daily:\n\n")
+           :empty-lines 1))))
 #+end_src
 
 ** Org-Roam-UI
@@ -232,6 +390,9 @@ Auto-tangle config.org to config.el on save:
   (setq gptel-model 'claude-sonnet-4-20250514
         gptel-backend (gptel-make-anthropic "Claude"
                         :stream t
+                        :models '(claude-sonnet-4-20250514
+                                  claude-opus-4-20250514
+                                  claude-haiku-4-5-20251001)
                         :key (lambda ()
                                (string-trim
                                 (with-temp-buffer
@@ -241,14 +402,71 @@ Auto-tangle config.org to config.el on save:
   ;; Gemini backend
   (gptel-make-gemini "Gemini"
     :stream t
+    :models '(gemini-2.5-pro gemini-2.5-flash)
     :key (lambda ()
            (string-trim
             (with-temp-buffer
               (insert-file-contents "~/.secrets/gemini_api_key")
               (buffer-string)))))
 
-  ;; UI
-  (setq gptel-default-mode 'org-mode))
+  ;; UI & behavior
+  (setq gptel-default-mode 'org-mode
+        gptel-org-branching-context t
+        gptel-prompt-prefix-alist
+        '((markdown-mode . "### ")
+          (org-mode . "* ")
+          (text-mode . "## "))
+        gptel-directives
+        '((default . "You are a helpful assistant.")
+          (code . "You are a senior software engineer. Give concise, correct code.")
+          (emacs . "You are an Emacs and Elisp expert. Give working Doom Emacs compatible code using use-package!, after!, map! macros.")
+          (writing . "You are a clear technical writer. Be concise, avoid fluff.")
+          (explain . "Explain simply. Use analogies for complex topics.")
+          (org-pkm . "You are a knowledge management expert. Help organize, connect, and refine notes. Suggest links between concepts. Use org-mode formatting.")
+          (debug . "You are a debugging expert. Analyze errors, suggest fixes. Be concise and precise.")
+          (refactor . "You are a code refactoring specialist. Suggest cleaner, more idiomatic solutions.")))
+
+  ;; gptel tools: let Claude interact with Emacs
+  (gptel-make-tool
+   :function (lambda ()
+               (with-current-buffer (or gptel--target-buffer (current-buffer))
+                 (buffer-substring-no-properties (point-min) (point-max))))
+   :name "read_buffer"
+   :description "Read the contents of the current Emacs buffer"
+   :args nil
+   :category "emacs")
+
+  (gptel-make-tool
+   :function (lambda ()
+               (mapconcat #'buffer-name
+                          (seq-filter (lambda (b)
+                                        (not (string-prefix-p " " (buffer-name b))))
+                                      (buffer-list))
+                          "\n"))
+   :name "list_buffers"
+   :description "List all open Emacs buffers"
+   :args nil
+   :category "emacs")
+
+  (gptel-make-tool
+   :function (lambda (query)
+               (mapconcat
+                (lambda (node)
+                  (format "- %s (%s)"
+                          (org-roam-node-title node)
+                          (org-roam-node-file node)))
+                (seq-filter
+                 (lambda (node)
+                   (string-match-p (regexp-quote query)
+                                   (org-roam-node-title node)))
+                 (org-roam-node-list))
+                "\n"))
+   :name "search_org_roam"
+   :description "Search org-roam notes by title"
+   :args (list '(:name "query"
+                 :type "string"
+                 :description "Search query to match against note titles"))
+   :category "org"))
 #+end_src
 
 ** Claude Code
@@ -267,10 +485,21 @@ Auto-tangle config.org to config.el on save:
        :desc "Send to AI"         "s" #'gptel-send
        :desc "AI menu"            "m" #'gptel-menu
        :desc "Rewrite region"     "r" #'gptel-rewrite
+       :desc "Set directive"      "d" #'gptel-system-prompt
        :desc "Claude Code start"  "c" #'claude-code-start
        :desc "Send region"        "e" #'claude-code-send-region
        :desc "Send buffer"        "b" #'claude-code-send-buffer
-       :desc "Switch backend"     "B" #'gptel-backend))
+       :desc "Switch backend"     "B" #'gptel-backend
+       :desc "Abort AI request"   "x" #'gptel-abort))
+
+;; Org-specific AI bindings (localleader in org buffers)
+(map! :after org
+      :map org-mode-map
+      :localleader
+      (:prefix ("a" . "AI")
+       :desc "Send subtree to AI"  "s" #'gptel-send
+       :desc "Rewrite region"      "r" #'gptel-rewrite
+       :desc "AI menu"             "m" #'gptel-menu))
 #+end_src
 
 * Writing & Focus (inspired by SystemCrafters/DistroTube)
@@ -359,18 +588,10 @@ Variable-pitch for prose, fixed-pitch for code (from SystemCrafters):
 
 * Performance (from SystemCrafters/Crafted Emacs)
 #+begin_src emacs-lisp
-;; GC tuning (SystemCrafters technique): already handled by Doom's gcmh
-;; but ensure LSP performance
+;; GC tuning: already handled by Doom's gcmh
+;; LSP performance (avoid duplicate — merged with Development section)
 (after! lsp-mode
-  (setq lsp-idle-delay 0.5
-        lsp-log-io nil
-        lsp-enable-file-watchers nil
-        lsp-headerline-breadcrumb-enable t))
-
-;; Defer company completions for speed (SystemCrafters tip)
-(after! company
-  (setq company-idle-delay 0.2
-        company-minimum-prefix-length 2))
+  (setq lsp-enable-file-watchers nil))
 #+end_src
 
 * Quality of Life
@@ -384,11 +605,23 @@ Variable-pitch for prose, fixed-pitch for code (from SystemCrafters):
 ;; Better defaults
 (setq-default fill-column 100
               tab-width 4
-              indent-tabs-mode nil)
+              indent-tabs-mode nil
+              truncate-lines t)
 
 ;; Auto-save and backup
 (setq auto-save-default t
       make-backup-files nil)
+
+;; Better undo limits
+(setq undo-limit 80000000
+      evil-want-fine-undo t)
+
+;; Remember more recent files
+(setq recentf-max-saved-items 200)
+
+;; Auto-revert files changed on disk
+(global-auto-revert-mode 1)
+(setq global-auto-revert-non-file-buffers t)
 
 ;; Smooth scrolling
 (setq mouse-wheel-scroll-amount '(3 ((shift) . 1))
@@ -400,12 +633,45 @@ Variable-pitch for prose, fixed-pitch for code (from SystemCrafters):
 ;; Rainbow delimiters in prog modes (from SystemCrafters)
 (add-hook! 'prog-mode-hook #'rainbow-delimiters-mode)
 
-;; Highlight TODO/FIXME in comments (from DistroTube)
+;; Highlight TODO/FIXME in comments (Gruvbox palette, from DistroTube)
 (after! hl-todo
   (setq hl-todo-keyword-faces
-        '(("TODO"  . (:foreground "#ffd040" :weight bold))
-          ("FIXME" . (:foreground "#ff5050" :weight bold))
-          ("HACK"  . (:foreground "#ff9030" :weight bold))
-          ("NOTE"  . (:foreground "#60c0ff" :weight bold))
-          ("BUG"   . (:foreground "#ff5050" :weight bold)))))
+        '(("TODO"        . (:foreground "#fabd2f" :weight bold))
+          ("FIXME"       . (:foreground "#fb4934" :weight bold))
+          ("HACK"        . (:foreground "#fe8019" :weight bold))
+          ("NOTE"        . (:foreground "#83a598" :weight bold))
+          ("BUG"         . (:foreground "#fb4934" :weight bold))
+          ("DEPRECATED"  . (:foreground "#928374" :weight bold :strike-through t))
+          ("REVIEW"      . (:foreground "#d3869b" :weight bold))
+          ("OPTIMIZE"    . (:foreground "#8ec07c" :weight bold))
+          ("IMPORTANT"   . (:foreground "#fe8019" :weight bold)))))
+
+;; Better dired
+(after! dired
+  (setq dired-dwim-target t
+        delete-by-moving-to-trash t))
+
+;; which-key enhancements
+(after! which-key
+  (setq which-key-idle-delay 0.3
+        which-key-idle-secondary-delay 0.05))
+
+;; Zen mode (writeroom)
+(after! writeroom-mode
+  (setq +zen-text-scale 0.8
+        writeroom-extra-line-spacing 0.3
+        writeroom-width 100))
+
+;; Vertico: more candidates
+(after! vertico
+  (setq vertico-count 15
+        vertico-cycle t))
+
+;; Company: faster completions
+(after! company
+  (setq company-idle-delay 0.2
+        company-minimum-prefix-length 2))
+
+;; Open helpful in side window
+(set-popup-rule! "^\\*helpful" :size 0.4 :select t :quit t)
 #+end_src

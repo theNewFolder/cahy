@@ -1,1 +1,156 @@
-{"backlight":{"format":"{icon} {percent}%","format-icons":["🌑","🌒","🌓","🌔","🌕"],"tooltip-format":"Brightness: {percent}%"},"battery":{"format":"{icon}  {capacity}%","format-charging":"  {capacity}%","format-icons":["","","","",""],"format-plugged":"  {capacity}%","states":{"critical":15,"warning":30},"tooltip-format":"{timeTo}\nPower: {power}W"},"clock":{"format":"  {:%I:%M %p}    {:%a %b %d}","format-alt":"  {:%Y-%m-%d %I:%M:%S %p}","tooltip-format":"<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"},"cpu":{"format":"  {usage}%","interval":5,"tooltip-format":"CPU: {usage}%\n{avg_frequency} GHz"},"custom/ai-status":{"exec":"~/.local/bin/ai-waybar-status","format":"{}","interval":5,"return-type":"json","tooltip":true},"custom/gpu":{"exec":"~/.local/bin/gpu-stats","format":"{}","interval":10,"return-type":"json","tooltip":true},"height":48,"hyprland/window":{"format":"{}","max-length":50,"separate-outputs":true},"hyprland/workspaces":{"all-outputs":true,"format":"{name}","on-click":"activate","sort-by-number":true},"layer":"top","margin-left":16,"margin-right":16,"margin-top":10,"memory":{"format":"  {percentage}%","interval":5,"tooltip-format":"RAM: {used:0.1f}G / {total:0.1f}G"},"modules-center":["clock"],"modules-left":["hyprland/workspaces","hyprland/window"],"modules-right":["custom/gpu","cpu","memory","temperature","custom/ai-status","mpris","backlight","tray","pulseaudio","network","battery"],"mpris":{"format":"{player_icon} {title}","format-paused":"{player_icon} <i>{title}</i>","max-length":30,"player-icons":{"default":"▶","firefox":"🌐","mpv":"🎵"}},"network":{"format-disconnected":"󰤭  Disconnected","format-ethernet":"󰈀  {ifname}","format-wifi":"󰤨  {essid} ({signalStrength}%)","interval":2,"tooltip-format":"{ifname}: {ipaddr}/{cidr}"},"position":"top","pulseaudio":{"format":"{icon}  {volume}%","format-icons":{"default":["󰕿","󰖀","󰕾"],"headphone":"󰋋"},"format-muted":"󰖁  {volume}%","on-click":"pavucontrol"},"spacing":10,"temperature":{"critical-threshold":85,"format":" {temperatureC}°C","hwmon-path-abs":"/sys/devices/pci0000:00/0000:00:18.3/hwmon","input-filename":"temp1_input","interval":5},"tray":{"icon-size":18,"spacing":8}}
+{
+    "layer": "top",
+    "position": "top",
+    "height": 44,
+    "margin-top": 8,
+    "margin-left": 12,
+    "margin-right": 12,
+    "spacing": 4,
+
+    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["custom/ai-status", "mpris", "custom/separator", "custom/gpu", "cpu", "memory", "temperature", "custom/separator2", "custom/asus-profile", "backlight", "pulseaudio", "network", "battery", "tray"],
+
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "format-icons": {
+            "1": "",
+            "2": "󰈹",
+            "3": "󰙯",
+            "4": "󰎁",
+            "5": "",
+            "6": "",
+            "7": "",
+            "8": "",
+            "9": "",
+            "active": "",
+            "default": ""
+        },
+        "persistent-workspaces": { "*": 5 },
+        "sort-by-number": true,
+        "on-click": "activate",
+        "all-outputs": true
+    },
+
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 40,
+        "separate-outputs": true
+    },
+
+    "clock": {
+        "format": " {:%I:%M %p}",
+        "format-alt": " {:%A, %B %d}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+
+    "cpu": {
+        "format": " {usage}%",
+        "interval": 5,
+        "tooltip-format": "CPU: {usage}%\n{avg_frequency} GHz"
+    },
+
+    "memory": {
+        "format": " {percentage}%",
+        "interval": 5,
+        "tooltip-format": "RAM: {used:0.1f}G / {total:0.1f}G"
+    },
+
+    "temperature": {
+        "critical-threshold": 85,
+        "format": " {temperatureC}°",
+        "hwmon-path-abs": "/sys/devices/pci0000:00/0000:00:18.3/hwmon",
+        "input-filename": "temp1_input",
+        "interval": 5
+    },
+
+    "custom/gpu": {
+        "exec": "~/.local/bin/gpu-stats",
+        "format": "{}",
+        "interval": 10,
+        "return-type": "json",
+        "tooltip": true
+    },
+
+    "mpris": {
+        "format": "{player_icon} {title}",
+        "format-paused": "{player_icon} <i>{title}</i>",
+        "max-length": 25,
+        "player-icons": {
+            "default": "▶",
+            "firefox": "󰈹",
+            "mpv": "󰎁"
+        }
+    },
+
+    "backlight": {
+        "format": "{icon} {percent}%",
+        "format-icons": ["󰃞", "󰃟", "󰃠"],
+        "tooltip-format": "Brightness: {percent}%"
+    },
+
+    "battery": {
+        "format": "{icon} {capacity}%",
+        "format-charging": "󰂄 {capacity}%",
+        "format-plugged": "󰚥 {capacity}%",
+        "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "tooltip-format": "{timeTo}\nPower: {power}W"
+    },
+
+    "network": {
+        "format-wifi": "󰤨 {essid}",
+        "format-ethernet": "󰈀 {ifname}",
+        "format-disconnected": "󰤭",
+        "tooltip-format": "{ifname}: {ipaddr}/{cidr}\n  {bandwidthUpBits}\n  {bandwidthDownBits}",
+        "interval": 2
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "󰖁",
+        "format-icons": {
+            "default": ["󰕿", "󰖀", "󰕾"],
+            "headphone": "󰋋"
+        },
+        "on-click": "pavucontrol"
+    },
+
+    "tray": {
+        "icon-size": 16,
+        "spacing": 6
+    },
+
+    "custom/ai-status": {
+        "exec": "~/.local/bin/ai-waybar-status",
+        "format": "{}",
+        "interval": 5,
+        "return-type": "json",
+        "tooltip": true,
+        "on-click": "foot -a floating -e claude"
+    },
+
+    "custom/asus-profile": {
+        "exec": "~/.local/bin/asus-waybar-status",
+        "format": "{}",
+        "interval": 5,
+        "return-type": "json",
+        "tooltip": true,
+        "on-click": "asusctl profile next"
+    },
+
+    "custom/separator": {
+        "format": "│",
+        "interval": "once",
+        "tooltip": false
+    },
+
+    "custom/separator2": {
+        "format": "│",
+        "interval": "once",
+        "tooltip": false
+    }
+}

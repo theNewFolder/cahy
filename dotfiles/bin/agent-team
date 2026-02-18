@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Agent Team — Start/stop/status for The Swarm
+set -euo pipefail
+
+AGENT_DIR="$HOME/ai-knowledge/agents"
+AGENTS=(orchestrator knowledge devworkflow researcher general-purpose opensource-trainer)
+
+case "${1:-status}" in
+  build)
+    echo "Building all agents..."
+    cd "$HOME/ai-knowledge"
+    for agent in "${AGENTS[@]}"; do
+      cd "$AGENT_DIR/$agent"
+      npx tsc 2>&1
+      echo "  $agent: built"
+    done
+    echo "All agents built."
+    ;;
+  status)
+    echo "Agent Team Status:"
+    for agent in "${AGENTS[@]}"; do
+      if [[ -f "$AGENT_DIR/$agent/dist/$agent/server.js" ]]; then
+        echo "  $agent: ready"
+      else
+        echo "  $agent: not built (run: agent-team build)"
+      fi
+    done
+    echo ""
+    echo "Agents auto-start when Claude Code opens ~/ai-knowledge/"
+    echo "Shortcut: Super+Ctrl+T"
+    ;;
+  start)
+    echo "Starting Claude Code with Agent Team..."
+    exec foot -a floating -T "Agent Team" -e claude --project "$HOME/ai-knowledge"
+    ;;
+  *)
+    echo "Usage: agent-team [build|status|start]"
+    ;;
+esac

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Quick AI prompt from wofi — type a question, get an answer in a notification
+set -euo pipefail
+
+PROMPT=$(wofi --dmenu --prompt "Ask AI" --width 600 --height 50 --cache-file /dev/null)
+
+if [[ -z "$PROMPT" ]]; then
+    exit 0
+fi
+
+notify-send "AI" "Thinking..." -t 2000
+
+RESPONSE=$(echo "$PROMPT" | gemini "Answer this concisely in 2-3 sentences: " 2>&1)
+
+if [[ -n "$RESPONSE" ]]; then
+    notify-send "AI Response" "$RESPONSE" -t 15000
+else
+    notify-send "AI" "No response received" -t 3000
+fi

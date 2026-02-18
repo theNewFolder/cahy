@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Rotate wallpaper randomly from ~/Pictures/Wallpapers/
+set -euo pipefail
+
+WALLDIR="$HOME/Pictures/Wallpapers"
+WALL=$(find "$WALLDIR" -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.webp" \) | shuf -n 1)
+
+if [[ -z "$WALL" ]]; then
+    notify-send "Wallpaper" "No wallpapers found in $WALLDIR"
+    exit 1
+fi
+
+# Update hyprpaper
+hyprctl hyprpaper unload all 2>/dev/null || true
+hyprctl hyprpaper preload "$WALL" 2>/dev/null || true
+
+# Get monitor name
+MONITOR=$(hyprctl monitors -j | jq -r '.[0].name')
+hyprctl hyprpaper wallpaper "$MONITOR,$WALL" 2>/dev/null || true
+
+notify-send "Wallpaper" "$(basename "$WALL")" -i "$WALL" -t 3000

@@ -1,6 +1,7 @@
+/* ── Reset ── */
 * {
-    font-family: "DankMono Nerd Font", "Font Awesome 6 Free";
-    font-size: 17px;
+    font-family: "DankMono Nerd Font", "Symbols Nerd Font", "Font Awesome 6 Free";
+    font-size: 15px;
     font-weight: 500;
     border: none;
     border-radius: 0;
@@ -9,11 +10,13 @@
     padding: 0;
 }
 
+/* ── Bar ── */
 window#waybar {
     background: transparent;
-    color: #fbf1c7;
+    color: #ebdbb2;
 }
 
+/* ── Shared Module Style ── */
 #workspaces,
 #window,
 #clock,
@@ -22,22 +25,23 @@ window#waybar {
 #temperature,
 #custom-gpu,
 #custom-ai-status,
+#custom-asus-profile,
 #mpris,
 #backlight,
 #battery,
 #network,
 #pulseaudio,
 #tray {
-    padding: 6px 16px;
-    margin: 4px 2px;
-    background: linear-gradient(135deg, #282828 0%, #3c3836 100%);
-    color: #fbf1c7;
-    border-radius: 12px;
-    border: 2px solid #504945;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    padding: 4px 14px;
+    margin: 3px 2px;
+    background: alpha(#282828, 0.85);
+    color: #ebdbb2;
+    border-radius: 10px;
+    border: 1.5px solid alpha(#504945, 0.6);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ── Hover Glow ── */
 #workspaces:hover,
 #window:hover,
 #clock:hover,
@@ -46,124 +50,252 @@ window#waybar {
 #temperature:hover,
 #custom-gpu:hover,
 #custom-ai-status:hover,
+#custom-asus-profile:hover,
 #mpris:hover,
 #backlight:hover,
 #battery:hover,
 #network:hover,
 #pulseaudio:hover,
 #tray:hover {
-    background: linear-gradient(135deg, #3c3836 0%, #504945 100%);
-    border-color: #ffd040;
-    box-shadow: 0 4px 12px rgba(250, 189, 47, 0.3);
+    background: alpha(#3c3836, 0.95);
+    border-color: alpha(#ffd040, 0.6);
+    box-shadow: 0 0 12px alpha(#ffd040, 0.15);
+}
+
+/* ── Separators ── */
+#custom-separator,
+#custom-separator2 {
+    color: alpha(#665c54, 0.5);
+    padding: 0 2px;
+    margin: 0;
+    background: transparent;
+    font-size: 14px;
+}
+
+/* ── Workspaces ── */
+#workspaces {
+    padding: 2px 6px;
 }
 
 #workspaces button {
-    padding: 0 8px;
-    color: #a09080;
+    padding: 2px 10px;
+    color: #665c54;
     border: none;
     border-radius: 8px;
     background: transparent;
+    font-size: 16px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#workspaces button:hover {
+    color: #ebdbb2;
+    background: alpha(#504945, 0.5);
 }
 
 #workspaces button.active {
-    background: linear-gradient(135deg, #ffd040 0%, #e8a50e 100%);
+    background: linear-gradient(135deg, #ffd040 0%, #fabd2f 100%);
     color: #1d2021;
     font-weight: bold;
+    box-shadow: 0 0 12px alpha(#ffd040, 0.5);
+    border-radius: 8px;
+    animation: glow-workspace 2s ease-in-out infinite;
 }
 
 #workspaces button.urgent {
-    background: linear-gradient(135deg, #ff5050 0%, #d42020 100%);
+    background: linear-gradient(135deg, #fb4934 0%, #cc241d 100%);
     color: #1d2021;
+    animation: pulse 1.5s ease-in-out infinite;
 }
 
+/* ── Window Title ── */
 #window {
-    color: #60c0ff;
+    color: #83a598;
     font-style: italic;
+    background: alpha(#282828, 0.6);
+    border-color: alpha(#504945, 0.3);
 }
 
+/* ── Clock ── */
 #clock {
-    background: linear-gradient(135deg, #60c0ff 0%, #4f96c8 100%);
+    background: linear-gradient(135deg, alpha(#458588, 0.9) 0%, alpha(#689d6a, 0.9) 50%, alpha(#83a598, 0.9) 100%);
     color: #1d2021;
     font-weight: bold;
-    padding: 6px 20px;
-    border-color: #60ff90;
+    font-size: 14px;
+    padding: 4px 18px;
+    border-color: alpha(#83a598, 0.6);
+    box-shadow: 0 0 10px alpha(#83a598, 0.2);
+    animation: clock-glow 4s ease-in-out infinite;
 }
 
-#cpu { color: #ff9030; }
-#memory { color: #ff60d0; }
-#temperature { color: #60ff90; }
+#clock:hover {
+    box-shadow: 0 0 20px alpha(#83a598, 0.5);
+    border-color: alpha(#8ec07c, 0.8);
+}
+
+/* ── System Monitors ── */
+#cpu {
+    color: #fe8019;
+    border-bottom: 2px solid alpha(#fe8019, 0.4);
+}
+
+#memory {
+    color: #d3869b;
+    border-bottom: 2px solid alpha(#d3869b, 0.4);
+}
+
+#temperature {
+    color: #8ec07c;
+    border-bottom: 2px solid alpha(#8ec07c, 0.4);
+}
 
 #temperature.critical {
-    background: linear-gradient(135deg, #ff5050 0%, #d42020 100%);
+    background: linear-gradient(135deg, #fb4934 0%, #cc241d 100%);
     color: #1d2021;
+    animation: pulse 1s ease-in-out infinite;
 }
 
-#custom-gpu { color: #d0f020; }
+#custom-gpu {
+    color: #b8bb26;
+    border-bottom: 2px solid alpha(#b8bb26, 0.4);
+}
 
-#custom-ai-status { color: #ff60d0; }
+/* ── AI Status ── */
+#custom-ai-status {
+    color: #d3869b;
+    border-bottom: 2px solid alpha(#d3869b, 0.4);
+}
 
+#custom-ai-status.active {
+    color: #b8bb26;
+    border-bottom-color: alpha(#b8bb26, 0.6);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* ── ASUS Profile ── */
+#custom-asus-profile {
+    color: #83a598;
+    font-size: 13px;
+}
+
+#custom-asus-profile.performance {
+    color: #fb4934;
+    border-bottom: 2px solid alpha(#fb4934, 0.4);
+}
+
+#custom-asus-profile.balanced {
+    color: #fabd2f;
+    border-bottom: 2px solid alpha(#fabd2f, 0.4);
+}
+
+#custom-asus-profile.quiet {
+    color: #8ec07c;
+    border-bottom: 2px solid alpha(#8ec07c, 0.4);
+}
+
+/* ── Media ── */
 #mpris {
-    color: #60ff90;
+    color: #8ec07c;
     font-style: italic;
+    background: alpha(#282828, 0.7);
+    border-color: alpha(#8ec07c, 0.3);
 }
 
-#backlight { color: #ffd040; }
+#mpris:hover {
+    border-color: alpha(#8ec07c, 0.6);
+    box-shadow: 0 0 12px alpha(#8ec07c, 0.15);
+}
 
-#battery { color: #ffd040; }
+/* ── Controls ── */
+#backlight {
+    color: #fabd2f;
+}
+
+#pulseaudio {
+    color: #d3869b;
+}
+
+#pulseaudio.muted {
+    color: #665c54;
+    background: alpha(#282828, 0.6);
+}
+
+/* ── Network ── */
+#network {
+    color: #83a598;
+}
+
+#network.disconnected {
+    color: #fb4934;
+    background: alpha(#3c1919, 0.8);
+    border-color: alpha(#fb4934, 0.4);
+}
+
+/* ── Battery ── */
+#battery {
+    color: #fabd2f;
+}
 
 #battery.charging {
-    background: linear-gradient(135deg, #d0f020 0%, #a8b020 100%);
     color: #1d2021;
+    background: linear-gradient(135deg, alpha(#b8bb26, 0.9) 0%, alpha(#98971a, 0.9) 100%);
+    border-color: alpha(#b8bb26, 0.6);
 }
 
 #battery.warning:not(.charging) {
-    background: linear-gradient(135deg, #ff9030 0%, #e86420 100%);
     color: #1d2021;
-    animation: blink 2s linear infinite;
+    background: linear-gradient(135deg, #fe8019 0%, #d65d0e 100%);
+    animation: pulse 2s ease-in-out infinite;
 }
 
 #battery.critical:not(.charging) {
-    background: linear-gradient(135deg, #ff5050 0%, #d42020 100%);
     color: #1d2021;
-    animation: blink 1s linear infinite;
+    background: linear-gradient(135deg, #fb4934 0%, #cc241d 100%);
+    animation: pulse 1s ease-in-out infinite;
 }
 
-#network { color: #60c0ff; }
-
-#network.disconnected {
-    background: linear-gradient(135deg, #801010 0%, #d42020 100%);
-    color: #fbf1c7;
+/* ── Tray ── */
+#tray {
+    padding: 4px 10px;
 }
 
-#pulseaudio { color: #ff60d0; }
-
-#pulseaudio.muted {
-    background: linear-gradient(135deg, #3c3836 0%, #504945 100%);
-    color: #a09080;
+#tray > .passive {
+    opacity: 0.5;
 }
 
-#tray { padding: 6px 12px; }
-#tray > .passive { opacity: 0.7; }
 #tray > .needs-attention {
-    background-color: #ff5050;
-    animation: blink 1s linear infinite;
+    background: alpha(#fb4934, 0.8);
+    animation: pulse 1s ease-in-out infinite;
 }
 
-@keyframes blink {
-    0% { opacity: 1.0; }
-    49% { opacity: 1.0; }
-    50% { opacity: 0.7; }
-    100% { opacity: 0.7; }
+/* ── Animations ── */
+@keyframes pulse {
+    0%   { opacity: 1.0; }
+    50%  { opacity: 0.6; }
+    100% { opacity: 1.0; }
 }
 
+@keyframes glow-workspace {
+    0%   { box-shadow: 0 0 8px alpha(#ffd040, 0.3); }
+    50%  { box-shadow: 0 0 16px alpha(#ffd040, 0.6); }
+    100% { box-shadow: 0 0 8px alpha(#ffd040, 0.3); }
+}
+
+@keyframes clock-glow {
+    0%   { box-shadow: 0 0 8px alpha(#83a598, 0.15); }
+    50%  { box-shadow: 0 0 14px alpha(#83a598, 0.35); }
+    100% { box-shadow: 0 0 8px alpha(#83a598, 0.15); }
+}
+
+/* ── Tooltip ── */
 tooltip {
-    background: #1d2021;
-    border: 2px solid #ffd040;
-    border-radius: 12px;
+    background: alpha(#1d2021, 0.95);
+    border: 1.5px solid alpha(#fabd2f, 0.5);
+    border-radius: 10px;
     padding: 8px 12px;
 }
 
 tooltip label {
-    color: #fbf1c7;
+    color: #ebdbb2;
     font-family: "DankMono Nerd Font";
+    font-size: 14px;
 }

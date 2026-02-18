@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Switch GPU modes via supergfxctl with notification
+# Modes: Hybrid (default, power saving), Integrated (no dGPU), AsusMuxDgpu (full dGPU)
+
+set -euo pipefail
+
+CURRENT=$(supergfxctl -g 2>/dev/null || echo "Unknown")
+
+OPTIONS="󰍹 Hybrid (Power Saving)\n Integrated (iGPU Only)\n󰢮 Dedicated (Full dGPU)"
+CHOICE=$(echo -e "$OPTIONS" | wofi --dmenu --prompt "GPU Mode (Current: $CURRENT)" --width 350 --height 200 --cache-file /dev/null)
+
+case "$CHOICE" in
+    *Hybrid*)
+        supergfxctl -m Hybrid
+        notify-send "GPU Mode" "Switched to Hybrid — dGPU powers down when idle" -i video-display
+        ;;
+    *Integrated*)
+        supergfxctl -m Integrated
+        notify-send "GPU Mode" "Switched to Integrated — dGPU fully off" -i video-display
+        ;;
+    *Dedicated*)
+        supergfxctl -m AsusMuxDgpu
+        notify-send "GPU Mode" "Switched to Dedicated — full dGPU performance\nReboot required!" -u critical -i video-display
+        ;;
+esac

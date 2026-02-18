@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# ASUS profile + battery status for waybar
+# Shows current performance profile and charge limit
+
+PROFILE=$(asusctl profile get 2>/dev/null | grep -oP 'Active profile: \K\w+' || echo "unknown")
+LIMIT=$(asusctl battery info 2>/dev/null | grep -oP 'charge limit: \K[0-9]+' || echo "?")
+
+case "$PROFILE" in
+    Quiet)       ICON="󰌪"; CLASS="quiet" ;;
+    Balanced)    ICON="󰓅"; CLASS="balanced" ;;
+    Performance) ICON="󰓅"; CLASS="performance" ;;
+    *)           ICON="?"; CLASS="unknown" ;;
+esac
+
+TOOLTIP="Profile: $PROFILE\nBattery limit: ${LIMIT}%"
+echo "{\"text\": \"$ICON $PROFILE\", \"tooltip\": \"$TOOLTIP\", \"class\": \"$CLASS\"}"

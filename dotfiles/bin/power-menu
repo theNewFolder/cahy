@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Power menu using wofi
+set -euo pipefail
+
+OPTIONS="  Lock\n  Logout\n  Suspend\n  Reboot\n  Shutdown"
+
+CHOICE=$(echo -e "$OPTIONS" | wofi --dmenu --prompt "Power" --width 250 --height 280 --cache-file /dev/null)
+
+case "$CHOICE" in
+    *Lock)     hyprlock ;;
+    *Logout)   hyprctl dispatch exit ;;
+    *Suspend)  systemctl suspend ;;
+    *Reboot)   systemctl reboot ;;
+    *Shutdown) systemctl poweroff ;;
+esac

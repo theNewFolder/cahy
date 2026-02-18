@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Quick learning prompt via wofi → agent-powered Claude Code session
+set -euo pipefail
+
+TOPIC=$(wofi --dmenu --prompt "Learn about..." --width 600 --height 50 --cache-file /dev/null 2>/dev/null)
+[[ -z "$TOPIC" ]] && exit 0
+
+notify-send "Agent Team" "Starting learning session: $TOPIC" -t 3000
+
+exec foot -a floating -T "Learning: $TOPIC" -e claude \
+  --project "$HOME/ai-knowledge" \
+  -p "I want to learn about $TOPIC. Use the knowledge manager to check my skill level, the researcher to find resources, and create a learning plan. Then teach me step by step."

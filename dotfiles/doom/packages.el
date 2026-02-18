@@ -8,7 +8,8 @@
 
 ;; Org extensions
 (package! org-roam-ui)              ; Graph visualization for org-roam
-(package! org-superstar)            ; Better heading bullets
+(package! org-modern)               ; Modern org-mode styling (replaces org-superstar)
+(package! org-superstar :disable t) ; Replaced by org-modern
 (package! toc-org)                  ; Auto-generate TOC in org files (from DistroTube)
 (package! org-appear)               ; Show emphasis markers when cursor is on them
 
