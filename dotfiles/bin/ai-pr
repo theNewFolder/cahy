@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# AI-powered PR description generator
+set -euo pipefail
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+BASE="${1:-main}"
+DIFF=$(git diff "$BASE"..."$BRANCH")
+COMMITS=$(git log "$BASE"..."$BRANCH" --oneline)
+
+if [ -z "$DIFF" ]; then
+    echo "No diff between $BASE and $BRANCH"
+    exit 1
+fi
+
+echo -e "Commits:\n$COMMITS\n\nDiff:\n$DIFF" | gemini "Generate a GitHub PR description for these changes. Include: ## Summary (2-3 bullets), ## Changes (detailed list), ## Testing (how to verify). Use markdown."

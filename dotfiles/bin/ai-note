@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Quick note capture to ~/ai-knowledge/
+set -euo pipefail
+
+CATEGORY="${1:-reference}"
+TITLE="${2:-$(date +%Y%m%d-%H%M%S)}"
+SLUG=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd 'a-z0-9-')
+DIR="$HOME/ai-knowledge/$CATEGORY"
+FILE="$DIR/$SLUG.org"
+
+mkdir -p "$DIR"
+
+if [ ! -f "$FILE" ]; then
+  cat > "$FILE" << TEMPLATE
+#+TITLE: $TITLE
+#+DATE: $(date +%Y-%m-%d)
+#+FILETAGS: :$CATEGORY:
+
+TEMPLATE
+fi
+
+emacsclient -c "$FILE" -a emacs

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# AI-powered code/command explainer
+set -euo pipefail
+if [ $# -gt 0 ]; then
+    INPUT="$*"
+else
+    INPUT=$(cat)
+fi
+echo "$INPUT" | gemini "Explain this clearly and concisely. If it's code, explain what it does and why. If it's a command, explain each flag."

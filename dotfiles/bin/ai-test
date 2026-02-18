@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# AI-powered test generator
+set -euo pipefail
+if [ $# -gt 0 ]; then
+    INPUT=$(cat "$@")
+else
+    INPUT=$(cat)
+fi
+echo "$INPUT" | gemini "Generate unit tests for this code. Use the appropriate testing framework for the language. Include edge cases."

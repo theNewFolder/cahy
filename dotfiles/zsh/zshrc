@@ -1,0 +1,126 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
+  source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
+fi
+
+# =============================================================================
+#  Zsh Configuration
+#  Migrated from Nix Home Manager
+# =============================================================================
+
+# ── History ──
+HISTSIZE=100000
+SAVEHIST=100000
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt SHARE_HISTORY
+
+# ── Keybindings ──
+# History search
+bindkey '^[[A' history-search-backward
+bindkey '^[[B' history-search-forward
+bindkey '^P' history-search-backward
+bindkey '^N' history-search-forward
+
+# Edit command in $EDITOR
+autoload -z edit-command-line
+zle -N edit-command-line
+bindkey '^X^E' edit-command-line
+
+# ── Performance ──
+# Cached compinit (only regenerate once per day)
+autoload -Uz compinit
+if [[ -n $HOME/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
+KEYTIMEOUT=1
+
+# ── Environment ──
+export EDITOR="emacsclient -t"
+export VISUAL="emacsclient -c"
+export PAGER="bat --style=plain"
+export MOZ_ENABLE_WAYLAND="1"
+export QT_QPA_PLATFORM="wayland"
+export PATH="$HOME/.local/bin:$HOME/bin:$HOME/.config/emacs/bin:$PATH"
+
+# ── Aliases ──
+# Modern CLI
+alias ls="eza --icons --group-directories-first"
+alias ll="eza -la --icons --group-directories-first"
+alias lt="eza --tree --icons -L 2"
+alias cat="bat --style=plain"
+alias top="btop"
+alias ..="cd .."
+alias ...="cd ../.."
+
+# Git
+alias g="git"
+alias gs="git status"
+alias gc="git commit"
+alias gp="git push"
+alias gd="git diff"
+alias glog="git log --oneline --graph --decorate -10"
+
+# AI Tools
+alias aic="ai-commit"
+alias air="ai-review"
+alias aie="ai-explain"
+alias aif="ai-fix"
+alias ais="ai-summarize"
+alias ait="ai-test"
+alias aip="ai-pr"
+alias aid="ai-doc"
+alias "ai?"="gemini"
+alias claude="claude"
+
+# Emacs / Doom
+alias e="emacsclient -c -a emacs"
+alias et="emacsclient -t -a emacs"
+alias doom="~/.config/emacs/bin/doom"
+alias doom-sync="~/.config/emacs/bin/doom sync"
+alias doom-upgrade="~/.config/emacs/bin/doom upgrade"
+alias doom-doctor="~/.config/emacs/bin/doom doctor"
+alias doom-tangle="~/.config/emacs/bin/doom tangle ~/.config/doom/config.org"
+alias magit="emacsclient -c -e '(magit-status)' -a emacs"
+alias org-agenda="emacsclient -c -e '(org-agenda nil "d")' -a emacs"
+alias org-capture="emacsclient -c -e '(org-capture)' -a emacs"
+alias org-roam="emacsclient -c -e '(org-roam-node-find)' -a emacs"
+
+# ── Tool Integrations ──
+
+# FNM (Fast Node Manager)
+if [[ -f "$HOME/.local/share/fnm/fnm" ]]; then
+  export PATH="$HOME/.local/share/fnm:$PATH"
+  eval "$($HOME/.local/share/fnm/fnm env --use-on-cd)"
+  export PATH="$HOME/.local/share/fnm/aliases/default/bin:$PATH"
+fi
+
+# Starship
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi
+
+# FZF
+if command -v fzf >/dev/null 2>&1; then
+  source <(fzf --zsh 2>/dev/null) 2>/dev/null
+  # FZF theming (Gruvbox)
+  export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+  export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --color=bg+:#3c3836,bg:#282828,spinner:#d79921,hl:#b16286,fg:#ebdbb2,header:#458588,info:#d79921,pointer:#d79921,marker:#fe8019,fg+:#ebdbb2,prompt:#d79921,hl+:#b16286'
+fi
+
+# Zoxide
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
+
+# Direnv
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook zsh)"
+fi
+
+# Helper functions
+mkcd() { mkdir -p "$1" && cd "$1"; }

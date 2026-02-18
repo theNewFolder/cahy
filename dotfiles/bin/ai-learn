@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Create a new learning note in ~/ai-knowledge/learning/
+set -euo pipefail
+
+TOPIC="${1:-general}"
+DATE=$(date +%Y-%m-%d)
+TIME=$(date +%H%M)
+DIR="$HOME/ai-knowledge/learning/$TOPIC"
+FILE="$DIR/$DATE-$TIME.org"
+
+mkdir -p "$DIR"
+
+cat > "$FILE" << TEMPLATE
+#+TITLE: Learning: $TOPIC — $DATE
+#+DATE: $(date +%Y-%m-%d)
+#+FILETAGS: :learning:$TOPIC:
+
+* What I Learned
+
+* Key Insights
+
+* Questions
+
+* Practice / Next Steps
+
+* Resources
+TEMPLATE
+
+echo "Created: $FILE"
+emacsclient -c "$FILE" -a emacs

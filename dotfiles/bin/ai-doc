@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# AI-powered documentation generator
+set -euo pipefail
+if [ $# -gt 0 ]; then
+    INPUT=$(cat "$@")
+else
+    INPUT=$(cat)
+fi
+echo "$INPUT" | gemini "Generate clear documentation for this code. Include: purpose, parameters, return values, usage examples. Match the language's doc style (JSDoc, docstrings, etc)."

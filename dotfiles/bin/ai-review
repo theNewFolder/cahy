@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# AI-powered code review using gemini
+set -euo pipefail
+if [ $# -gt 0 ]; then
+    INPUT=$(cat "$@")
+else
+    INPUT=$(git diff)
+fi
+if [ -z "$INPUT" ]; then
+    echo "No diff to review. Pass files or have unstaged changes."
+    exit 1
+fi
+echo "$INPUT" | gemini "Review this code diff for bugs, security issues, performance problems, and style improvements. Be concise and actionable."

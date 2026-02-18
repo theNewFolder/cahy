@@ -7,37 +7,39 @@
 - Timezone: Asia/Dubai
 - Theme: Gruvbox Dark Vibrant
 - Font: DankMono Nerd Font (from github.com/theNewFolder/my-fontsDank)
-- WM: SwayFX (Wayland)
-- Editor: Emacs daemon (emacsclient)
-- Shell: zsh (default), bash also configured
-- Terminal: foot (server mode)
+- WM: Hyprland (Wayland)
+- Editor: Doom Emacs daemon (emacsclient), config in ~/.config/doom/ (symlinked from ~/cahy/dotfiles/doom)
+- Shell: zsh (default)
+- Terminal: foot
 
 ## Environment
-- CachyOS (Arch-based), Intel i5-8365U, UHD 620, 16GB RAM
-- Determinate Nix installed at /nix/var/nix/profiles/default/bin
+- CachyOS (Arch-based), ASUS TUF A15, Ryzen 7 7435HS, RTX 3050, 16GB DDR5
 - Node.js via fnm at ~/.local/share/fnm
 - gh, lazygit, gemini-cli, claude-code all installed
-- Home-manager via Nix flake at ~/cahy
+- Dotfiles at ~/cahy/dotfiles/
+- Doom Emacs at ~/.config/emacs, config at ~/.config/doom/
 
 ## Project Structure
-- ~/cahy/ — flake.nix + home.nix + modules/ (CachyOS setup repo)
+- ~/cahy/ — dotfiles repo (standard config, no Nix)
 - ~/org/ — Org-mode PKM (GitHub private: theNewFolder/org-pkm)
-- ~/.config/sway/ — SwayFX config (Gruvbox)
-- ~/.config/emacs/ — Emacs config (straight.el + use-package)
+- ~/ai-knowledge/ — AI learning notes and knowledge base
+- ~/.config/doom/ — Doom Emacs config (init.el, config.org, packages.el)
+- ~/.config/hypr/ — Hyprland config (symlinked from dotfiles/hypr)
 
-## Sway / Waybar
-- Bar: Waybar with Gruvbox theme (~/.config/waybar/style.css)
-- Sway config: ~/.config/sway/config
-- Autostart: nm-applet, polkit-gnome, wlsunset, kanshi, swayidle
-- GTK CSS caveat: gnome-themes-extra has no GTK4 CSS — don't set `theme.package` in home.nix gtk section; GTK4 dark mode uses `prefer-dark-theme` setting only
-- Waybar CSS caveat: GTK CSS parser doesn't support comma-separated `%` in `@keyframes` — use separate stops
+## Hyprland / Waybar
+- Bar: Waybar with Gruvbox gradient pills, GPU/AI/system modules
+- Hyprland config: managed in dotfiles/hypr/hyprland.conf
+- Autostart: nm-applet, polkit-gnome, wlsunset, hyprpaper, hypridle, mako
+- GTK CSS caveat: gnome-themes-extra has no GTK4 CSS — don't set `theme.package`; GTK4 dark mode uses `prefer-dark-theme` only
+- Waybar CSS caveat: GTK CSS parser doesn't support comma-separated `%` in `@keyframes`
 
 ## Key Configs
-- Home-manager modules: modules/secrets.nix, modules/github.nix, modules/emacs.nix
-- AI scripts: ~/.local/bin/ai-commit, ai-review, ai-explain, ai-fix
-- Firefox: userChrome.css (minimal Gruvbox), user.js (perf tweaks), tridactylrc
-- Emacs vterm requires libvterm (pacman: libvterm) for module compilation
+- AI scripts: ~/.local/bin/ai-{commit,review,explain,fix,summarize,test,pr,doc} (symlinked from dotfiles/bin)
+- MCP servers: gemini, filesystem, git, github, memory (in ~/.config/claude/settings.json)
+- Firefox: userChrome.css (minimal Gruvbox), user.js (NVIDIA HW accel), tridactylrc
+- Doom Emacs: gptel (Claude + Gemini), claude-code.el, org-roam, SPC a = AI leader
 
-## Rebuild Commands
-- `home-manager switch --flake ~/cahy#dev -b backup`
-- Nix path: `export PATH="/nix/var/nix/profiles/default/bin:$PATH"`
+## Management Commands
+- `./install.sh` (links configs)
+- `doom sync` (after changing doom config)
+- System update: `sudo pacman -Syu`

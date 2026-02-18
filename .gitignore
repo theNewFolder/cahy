@@ -3,7 +3,9 @@ result
 *.swp
 *~
 .env
+.mcp.json
 
 # Never commit actual secrets
 .secrets/
 !secrets/README.md
+.claude/

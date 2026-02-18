@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# AI process status for waybar custom module
+# Shows running claude/gemini sessions
+
+CLAUDE_COUNT=$(pgrep -c -f "claude" 2>/dev/null || echo 0)
+GEMINI_COUNT=$(pgrep -c -f "gemini" 2>/dev/null || echo 0)
+TOTAL=$((CLAUDE_COUNT + GEMINI_COUNT))
+
+if [ "$TOTAL" -gt 0 ]; then
+  TOOLTIP="Claude: $CLAUDE_COUNT sessions\nGemini: $GEMINI_COUNT sessions"
+  echo "{\"text\": \"🤖 $TOTAL\", \"tooltip\": \"$TOOLTIP\", \"class\": \"active\"}"
+else
+  echo "{\"text\": \"🤖\", \"tooltip\": \"No AI sessions\", \"class\": \"idle\"}"
+fi

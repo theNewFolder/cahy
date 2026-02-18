@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# AI-powered commit message generator using gemini
+set -euo pipefail
+DIFF=$(git diff --staged)
+if [ -z "$DIFF" ]; then
+    echo "No staged changes. Stage files first with: git add <files>"
+    exit 1
+fi
+echo "$DIFF" | gemini "Generate a concise git commit message for these changes. Format: type(scope): description. Types: feat, fix, refactor, docs, chore, style, test. One line only, no quotes."

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# AI-powered code fixer
+set -euo pipefail
+if [ $# -gt 0 ]; then
+    INPUT=$(cat "$@")
+else
+    INPUT=$(cat)
+fi
+echo "$INPUT" | gemini "Find and fix issues in this code. Show the corrected version with brief comments explaining each fix."

@@ -1,0 +1,169 @@
+* {
+    font-family: "DankMono Nerd Font", "Font Awesome 6 Free";
+    font-size: 17px;
+    font-weight: 500;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+window#waybar {
+    background: transparent;
+    color: #fbf1c7;
+}
+
+#workspaces,
+#window,
+#clock,
+#cpu,
+#memory,
+#temperature,
+#custom-gpu,
+#custom-ai-status,
+#mpris,
+#backlight,
+#battery,
+#network,
+#pulseaudio,
+#tray {
+    padding: 6px 16px;
+    margin: 4px 2px;
+    background: linear-gradient(135deg, #282828 0%, #3c3836 100%);
+    color: #fbf1c7;
+    border-radius: 12px;
+    border: 2px solid #504945;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+#workspaces:hover,
+#window:hover,
+#clock:hover,
+#cpu:hover,
+#memory:hover,
+#temperature:hover,
+#custom-gpu:hover,
+#custom-ai-status:hover,
+#mpris:hover,
+#backlight:hover,
+#battery:hover,
+#network:hover,
+#pulseaudio:hover,
+#tray:hover {
+    background: linear-gradient(135deg, #3c3836 0%, #504945 100%);
+    border-color: #ffd040;
+    box-shadow: 0 4px 12px rgba(250, 189, 47, 0.3);
+}
+
+#workspaces button {
+    padding: 0 8px;
+    color: #a09080;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+}
+
+#workspaces button.active {
+    background: linear-gradient(135deg, #ffd040 0%, #e8a50e 100%);
+    color: #1d2021;
+    font-weight: bold;
+}
+
+#workspaces button.urgent {
+    background: linear-gradient(135deg, #ff5050 0%, #d42020 100%);
+    color: #1d2021;
+}
+
+#window {
+    color: #60c0ff;
+    font-style: italic;
+}
+
+#clock {
+    background: linear-gradient(135deg, #60c0ff 0%, #4f96c8 100%);
+    color: #1d2021;
+    font-weight: bold;
+    padding: 6px 20px;
+    border-color: #60ff90;
+}
+
+#cpu { color: #ff9030; }
+#memory { color: #ff60d0; }
+#temperature { color: #60ff90; }
+
+#temperature.critical {
+    background: linear-gradient(135deg, #ff5050 0%, #d42020 100%);
+    color: #1d2021;
+}
+
+#custom-gpu { color: #d0f020; }
+
+#custom-ai-status { color: #ff60d0; }
+
+#mpris {
+    color: #60ff90;
+    font-style: italic;
+}
+
+#backlight { color: #ffd040; }
+
+#battery { color: #ffd040; }
+
+#battery.charging {
+    background: linear-gradient(135deg, #d0f020 0%, #a8b020 100%);
+    color: #1d2021;
+}
+
+#battery.warning:not(.charging) {
+    background: linear-gradient(135deg, #ff9030 0%, #e86420 100%);
+    color: #1d2021;
+    animation: blink 2s linear infinite;
+}
+
+#battery.critical:not(.charging) {
+    background: linear-gradient(135deg, #ff5050 0%, #d42020 100%);
+    color: #1d2021;
+    animation: blink 1s linear infinite;
+}
+
+#network { color: #60c0ff; }
+
+#network.disconnected {
+    background: linear-gradient(135deg, #801010 0%, #d42020 100%);
+    color: #fbf1c7;
+}
+
+#pulseaudio { color: #ff60d0; }
+
+#pulseaudio.muted {
+    background: linear-gradient(135deg, #3c3836 0%, #504945 100%);
+    color: #a09080;
+}
+
+#tray { padding: 6px 12px; }
+#tray > .passive { opacity: 0.7; }
+#tray > .needs-attention {
+    background-color: #ff5050;
+    animation: blink 1s linear infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1.0; }
+    49% { opacity: 1.0; }
+    50% { opacity: 0.7; }
+    100% { opacity: 0.7; }
+}
+
+tooltip {
+    background: #1d2021;
+    border: 2px solid #ffd040;
+    border-radius: 12px;
+    padding: 8px 12px;
+}
+
+tooltip label {
+    color: #fbf1c7;
+    font-family: "DankMono Nerd Font";
+}

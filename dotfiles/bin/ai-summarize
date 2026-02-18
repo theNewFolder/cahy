@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# AI-powered text/file summarizer
+set -euo pipefail
+if [ $# -gt 0 ]; then
+    INPUT=$(cat "$@")
+else
+    INPUT=$(cat)
+fi
+echo "$INPUT" | gemini "Summarize this concisely. Keep key points, remove fluff. Use bullet points for long content."

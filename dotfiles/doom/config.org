@@ -1,0 +1,297 @@
+#+TITLE: Doom Emacs Configuration
+#+AUTHOR: theNewFolder
+#+PROPERTY: header-args:emacs-lisp :tangle config.el :results silent
+#+STARTUP: overview
+
+* Identity
+#+begin_src emacs-lisp
+(setq user-full-name "theNewFolder"
+      user-mail-address "theNewFolder@users.noreply.github.com")
+#+end_src
+
+* Theme & UI
+#+begin_src emacs-lisp
+;; Gruvbox dark hard theme
+(setq doom-theme 'gruvbox-dark-hard)
+
+;; Font: DankMono Nerd Font
+(setq doom-font (font-spec :family "DankMono Nerd Font" :size 14)
+      doom-variable-pitch-font (font-spec :family "Noto Sans" :size 14)
+      doom-big-font (font-spec :family "DankMono Nerd Font" :size 20))
+
+;; Line numbers
+(setq display-line-numbers-type 'relative)
+
+;; Transparency
+(add-to-list 'default-frame-alist '(alpha-background . 95))
+
+;; Misc UI
+(setq doom-modeline-height 28
+      doom-modeline-bar-width 4
+      doom-modeline-icon t
+      doom-modeline-major-mode-icon t)
+
+;; Scroll margin
+(setq scroll-margin 8)
+
+;; which-key delay
+(setq which-key-idle-delay 0.3)
+#+end_src
+
+* Org Mode
+** Core Setup
+#+begin_src emacs-lisp
+(setq org-directory "~/org")
+(after! org
+  (setq org-log-done 'time
+        org-log-into-drawer t
+        org-startup-indented t
+        org-startup-folded 'overview
+        org-ellipsis " ▾"
+        org-hide-emphasis-markers t
+        org-return-follows-link t
+        org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "IN-PROGRESS(i)" "WAITING(w@)" "|" "DONE(d)" "CANCELLED(c@)"))
+        org-todo-keyword-faces '(("TODO" . (:foreground "#fabd2f" :weight bold))
+                                 ("NEXT" . (:foreground "#83a598" :weight bold))
+                                 ("IN-PROGRESS" . (:foreground "#fe8019" :weight bold))
+                                 ("WAITING" . (:foreground "#d3869b" :weight bold))
+                                 ("DONE" . (:foreground "#b8bb26" :weight bold))
+                                 ("CANCELLED" . (:foreground "#928374" :weight bold)))))
+#+end_src
+
+** Org Superstar
+#+begin_src emacs-lisp
+(after! org-superstar
+  (setq org-superstar-headline-bullets-list '("◉" "○" "✸" "✿" "◆" "●" "►")
+        org-superstar-prettify-item-bullets t))
+#+end_src
+
+** Capture Templates
+#+begin_src emacs-lisp
+(after! org
+  (setq org-capture-templates
+        '(("t" "Todo" entry (file+headline "~/org/tasks.org" "Inbox")
+           "* TODO %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n%i" :prepend t)
+
+          ("n" "Note" entry (file "~/org/notes.org")
+           "* %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n%i")
+
+          ("j" "Journal" entry (file+olp+datetree "~/org/journal.org")
+           "* %<%I:%M %p> %?\n%i" :tree-type week)
+
+          ("i" "Idea" entry (file "~/org/ideas.org")
+           "* IDEA %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n%i")
+
+          ("p" "Project" entry (file "~/org/projects.org")
+           "* PROJECT %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n** Goals\n** Tasks\n** Notes")
+
+          ("m" "Meeting" entry (file "~/org/meetings.org")
+           "* MEETING %? :meeting:\n:PROPERTIES:\n:DATE: %U\n:END:\n** Attendees\n** Notes\n** Action Items")
+
+          ("l" "Learning" entry (file "~/org/learning.org")
+           "* LEARN %?\n:PROPERTIES:\n:CREATED: %U\n:SOURCE:\n:END:\n** Key Points\n** Questions\n** Practice")
+
+          ("w" "Web Capture" entry (file "~/org/inbox.org")
+           "* %:description\n:PROPERTIES:\n:URL: %:link\n:CREATED: %U\n:END:\n%:initial\n%?"))))
+#+end_src
+
+** Agenda
+#+begin_src emacs-lisp
+(after! org
+  (setq org-agenda-files '("~/org/tasks.org"
+                            "~/org/projects.org"
+                            "~/org/meetings.org"
+                            "~/org/habits.org"
+                            "~/org/inbox.org")
+        org-agenda-start-with-log-mode t
+        org-agenda-span 'week
+        org-agenda-start-on-weekday 1
+
+        org-agenda-custom-commands
+        '(("d" "Dashboard"
+           ((agenda "" ((org-agenda-span 'day)))
+            (todo "NEXT" ((org-agenda-overriding-header "Next Actions")))
+            (todo "IN-PROGRESS" ((org-agenda-overriding-header "In Progress")))
+            (todo "WAITING" ((org-agenda-overriding-header "Waiting")))))
+
+          ("n" "Next Actions"
+           ((todo "NEXT" ((org-agenda-overriding-header "All Next Actions")))))
+
+          ("w" "Weekly Review"
+           ((agenda "" ((org-agenda-span 'week)))
+            (todo "DONE" ((org-agenda-overriding-header "Completed This Week")))
+            (todo "TODO" ((org-agenda-overriding-header "Remaining TODOs"))))))))
+#+end_src
+
+** Org-Roam
+#+begin_src emacs-lisp
+(after! org-roam
+  (setq org-roam-directory "~/org/roam"
+        org-roam-dailies-directory "daily/"
+        org-roam-completion-everywhere t
+        org-roam-capture-templates
+        '(("d" "default" plain "%?"
+           :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+created: %U\n#+filetags:\n\n")
+           :unnarrowed t)
+          ("r" "reference" plain "%?"
+           :target (file+head "reference/%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+created: %U\n#+filetags: :reference:\n\n* Source\n\n* Notes\n\n")
+           :unnarrowed t))
+
+        org-roam-dailies-capture-templates
+        '(("d" "default" entry "* %<%I:%M %p> %?"
+           :target (file+head "%<%Y-%m-%d>.org"
+                              "#+title: %<%Y-%m-%d %A>\n\n")))))
+#+end_src
+
+** Org-Roam-UI
+#+begin_src emacs-lisp
+(use-package! org-roam-ui
+  :after org-roam
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start nil))
+#+end_src
+
+** Visual Line Mode in Org
+#+begin_src emacs-lisp
+(add-hook! 'org-mode-hook #'visual-line-mode)
+#+end_src
+
+* AI Integration
+** gptel (Claude + Gemini)
+#+begin_src emacs-lisp
+(use-package! gptel
+  :config
+  ;; Claude backend (default)
+  (setq gptel-model 'claude-sonnet-4-20250514
+        gptel-backend (gptel-make-anthropic "Claude"
+                        :stream t
+                        :key (lambda ()
+                               (string-trim
+                                (with-temp-buffer
+                                  (insert-file-contents "~/.secrets/anthropic_api_key")
+                                  (buffer-string))))))
+
+  ;; Gemini backend
+  (gptel-make-gemini "Gemini"
+    :stream t
+    :key (lambda ()
+           (string-trim
+            (with-temp-buffer
+              (insert-file-contents "~/.secrets/gemini_api_key")
+              (buffer-string)))))
+
+  ;; UI
+  (setq gptel-default-mode 'org-mode))
+#+end_src
+
+** Claude Code
+#+begin_src emacs-lisp
+(use-package! claude-code
+  :commands (claude-code-start claude-code-send-region claude-code-send-buffer)
+  :config
+  (setq claude-code-use-evil t))
+#+end_src
+
+** AI Leader Keybindings
+#+begin_src emacs-lisp
+(map! :leader
+      (:prefix ("a" . "AI")
+       :desc "Chat with AI"       "a" #'gptel
+       :desc "Send to AI"         "s" #'gptel-send
+       :desc "AI menu"            "m" #'gptel-menu
+       :desc "Rewrite region"     "r" #'gptel-rewrite
+       :desc "Claude Code start"  "c" #'claude-code-start
+       :desc "Send region"        "e" #'claude-code-send-region
+       :desc "Send buffer"        "b" #'claude-code-send-buffer
+       :desc "Switch backend"     "B" #'gptel-backend))
+#+end_src
+
+* Development
+** LSP
+#+begin_src emacs-lisp
+(after! lsp-mode
+  (setq lsp-idle-delay 0.5
+        lsp-log-io nil
+        lsp-headerline-breadcrumb-enable t))
+#+end_src
+
+** Tree-sitter
+#+begin_src emacs-lisp
+(setq +tree-sitter-hl-enabled-modes t)
+#+end_src
+
+** Format on Save
+#+begin_src emacs-lisp
+(setq +format-on-save-enabled-modes
+      '(not emacs-lisp-mode
+            sql-mode
+            tex-mode
+            latex-mode
+            org-mode))
+#+end_src
+
+** Projectile
+#+begin_src emacs-lisp
+(setq projectile-project-search-path '("~/projects" "~/cahy"))
+#+end_src
+
+* Evil & Keybindings
+** Leader Key Enhancements
+#+begin_src emacs-lisp
+(map! :leader
+      ;; Org
+      (:prefix ("o" . "Org")
+       :desc "Agenda"             "a" #'org-agenda
+       :desc "Capture"            "c" #'org-capture
+       :desc "Roam find"          "r" #'org-roam-node-find
+       :desc "Roam insert"        "i" #'org-roam-node-insert
+       :desc "Roam buffer"        "b" #'org-roam-buffer-toggle
+       :desc "Roam UI"            "u" #'org-roam-ui-open
+       :desc "Roam daily today"   "d" #'org-roam-dailies-capture-today
+       :desc "Roam daily goto"    "D" #'org-roam-dailies-goto-today
+       :desc "Journal"            "j" #'org-journal-new-entry)
+
+      ;; Git
+      (:prefix ("g" . "Git")
+       :desc "Magit status"       "g" #'magit-status
+       :desc "Magit blame"        "b" #'magit-blame
+       :desc "Magit log"          "l" #'magit-log-current
+       :desc "Magit diff"         "d" #'magit-diff-dwim
+       :desc "Git timemachine"    "t" #'git-timemachine)
+
+      ;; Eval
+      (:prefix ("e" . "Eval")
+       :desc "Eval buffer"        "b" #'+eval/buffer
+       :desc "Eval region"        "r" #'+eval/region
+       :desc "Eval line"          "l" #'+eval/line-or-region))
+#+end_src
+
+* Quality of Life
+#+begin_src emacs-lisp
+;; Don't ask when killing emacs with running processes
+(setq confirm-kill-processes nil)
+
+;; Don't ask when quitting
+(setq confirm-kill-emacs nil)
+
+;; Better defaults
+(setq-default fill-column 100
+              tab-width 4
+              indent-tabs-mode nil)
+
+;; Auto-save and backup
+(setq auto-save-default t
+      make-backup-files nil)
+
+;; Smooth scrolling
+(setq mouse-wheel-scroll-amount '(3 ((shift) . 1))
+      mouse-wheel-progressive-speed nil)
+
+;; Treemacs width
+(setq treemacs-width 30)
+#+end_src

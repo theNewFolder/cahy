@@ -1,0 +1,24 @@
+anchor=top-right
+background-color=#282828
+border-color=#ffd040
+border-radius=12
+border-size=2
+default-timeout=5000
+font=DankMono Nerd Font 12
+height=150
+icons=true
+layer=overlay
+margin=10
+max-icon-size=48
+max-visible=3
+padding=12
+text-color=#fbf1c7
+width=350
+
+[urgency=critical]
+border-color=#ff5050
+default-timeout=0
+
+[urgency=low]
+border-color=#504945
+default-timeout=3000
