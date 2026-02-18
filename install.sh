@@ -70,4 +70,15 @@ for script in "$DOTFILES/bin/"*; do
     fi
 done
 
+# Link Desktop Applications
+APP_DIR="$HOME/.local/share/applications"
+mkdir -p "$APP_DIR"
+echo "Linking desktop applications..."
+for app in "$DOTFILES/applications/"*; do
+    if [ -f "$app" ]; then
+        name=$(basename "$app")
+        ln -sf "$app" "$APP_DIR/$name"
+    fi
+done
+
 echo "Installation complete! Please restart your shell or log out and back in."
