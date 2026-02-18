@@ -1,0 +1,16 @@
+[Added Associations]
+
+[Default Applications]
+application/pdf=org.pwmt.zathura.desktop
+audio/flac=mpv.desktop
+audio/mpeg=mpv.desktop
+image/gif=imv.desktop
+image/jpeg=imv.desktop
+image/png=imv.desktop
+image/webp=imv.desktop
+video/mp4=mpv.desktop
+video/webm=mpv.desktop
+video/x-matroska=mpv.desktop
+x-scheme-handler/org-protocol=org-protocol.desktop
+
+[Removed Associations]

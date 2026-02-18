@@ -39,6 +39,7 @@ link_config "mako" "mako"
 link_config "foot" "foot"
 link_config "kitty" "kitty"
 link_config "starship.toml" "starship.toml"
+link_config "mimeapps.list" "mimeapps.list"
 
 # Link Doom Emacs
 if [ -d "$DOTFILES/doom" ]; then
