@@ -15,26 +15,36 @@
 (setq doom-theme 'gruvbox-dark-hard)
 
 ;; Font: DankMono Nerd Font
+;; Inspired by DistroTube: italicize comments/keywords for readability
 (setq doom-font (font-spec :family "DankMono Nerd Font" :size 14)
       doom-variable-pitch-font (font-spec :family "Noto Sans" :size 14)
-      doom-big-font (font-spec :family "DankMono Nerd Font" :size 20))
+      doom-big-font (font-spec :family "DankMono Nerd Font" :size 20)
+      doom-serif-font (font-spec :family "Noto Serif" :size 14))
 
-;; Line numbers
+;; Italic comments and keywords (from DistroTube's config)
+(custom-set-faces!
+  '(font-lock-comment-face :slant italic)
+  '(font-lock-keyword-face :slant italic))
+
+;; Line numbers (relative for evil motions, disabled in org/term)
 (setq display-line-numbers-type 'relative)
+(dolist (mode '(org-mode-hook term-mode-hook vterm-mode-hook eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 ;; Transparency
 (add-to-list 'default-frame-alist '(alpha-background . 95))
 
-;; Misc UI
+;; Modeline
 (setq doom-modeline-height 28
       doom-modeline-bar-width 4
       doom-modeline-icon t
-      doom-modeline-major-mode-icon t)
+      doom-modeline-major-mode-icon t
+      doom-modeline-buffer-file-name-style 'truncate-upto-project)
 
-;; Scroll margin
+;; Scroll margin (like SystemCrafters recommends)
 (setq scroll-margin 8)
 
-;; which-key delay
+;; which-key (shorter delay like DistroTube)
 (setq which-key-idle-delay 0.3)
 #+end_src
 
@@ -161,6 +171,58 @@
 (add-hook! 'org-mode-hook #'visual-line-mode)
 #+end_src
 
+** Org-Appear (show markers at cursor)
+#+begin_src emacs-lisp
+(use-package! org-appear
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autoemphasis t
+        org-appear-autosubmarkers t
+        org-appear-autolinks nil))
+#+end_src
+
+** TOC-Org (auto table of contents — from DistroTube)
+#+begin_src emacs-lisp
+(use-package! toc-org
+  :hook (org-mode . toc-org-mode))
+#+end_src
+
+** Org Structure Templates (quick blocks — from SystemCrafters)
+#+begin_src emacs-lisp
+(after! org
+  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python"))
+  (add-to-list 'org-structure-template-alist '("rs" . "src rust"))
+  (add-to-list 'org-structure-template-alist '("js" . "src javascript"))
+  (add-to-list 'org-structure-template-alist '("yaml" . "src yaml")))
+#+end_src
+
+** Org Babel Languages
+#+begin_src emacs-lisp
+(after! org
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t)
+     (shell . t)
+     (js . t))))
+#+end_src
+
+** Org Auto-Tangle (literate config — from SystemCrafters)
+Auto-tangle config.org to config.el on save:
+#+begin_src emacs-lisp
+(defun my/org-babel-tangle-config ()
+  "Tangle config.org if it's in doom config directory."
+  (when (string-equal (file-name-nondirectory (buffer-file-name))
+                      "config.org")
+    (let ((org-confirm-babel-evaluate nil))
+      (org-babel-tangle))))
+
+(add-hook 'org-mode-hook
+          (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config nil t)))
+#+end_src
+
 * AI Integration
 ** gptel (Claude + Gemini)
 #+begin_src emacs-lisp
@@ -211,6 +273,28 @@
        :desc "Switch backend"     "B" #'gptel-backend))
 #+end_src
 
+* Writing & Focus (inspired by SystemCrafters/DistroTube)
+** Olivetti (centered writing)
+#+begin_src emacs-lisp
+(use-package! olivetti
+  :hook (org-mode . olivetti-mode)
+  :config
+  (setq olivetti-body-width 100
+        olivetti-minimum-body-width 80))
+#+end_src
+
+** Mixed Pitch in Org
+Variable-pitch for prose, fixed-pitch for code (from SystemCrafters):
+#+begin_src emacs-lisp
+(add-hook! 'org-mode-hook #'mixed-pitch-mode)
+#+end_src
+
+** Git Timemachine (from DistroTube)
+#+begin_src emacs-lisp
+(use-package! git-timemachine
+  :defer t)
+#+end_src
+
 * Development
 ** LSP
 #+begin_src emacs-lisp
@@ -256,19 +340,37 @@
        :desc "Roam daily goto"    "D" #'org-roam-dailies-goto-today
        :desc "Journal"            "j" #'org-journal-new-entry)
 
-      ;; Git
+      ;; Git (enhanced from DistroTube)
       (:prefix ("g" . "Git")
        :desc "Magit status"       "g" #'magit-status
        :desc "Magit blame"        "b" #'magit-blame
        :desc "Magit log"          "l" #'magit-log-current
        :desc "Magit diff"         "d" #'magit-diff-dwim
-       :desc "Git timemachine"    "t" #'git-timemachine)
+       :desc "Git timemachine"    "t" #'git-timemachine
+       :desc "Magit fetch"        "f" #'magit-fetch
+       :desc "Magit push"         "p" #'magit-push)
 
       ;; Eval
       (:prefix ("e" . "Eval")
        :desc "Eval buffer"        "b" #'+eval/buffer
        :desc "Eval region"        "r" #'+eval/region
        :desc "Eval line"          "l" #'+eval/line-or-region))
+#+end_src
+
+* Performance (from SystemCrafters/Crafted Emacs)
+#+begin_src emacs-lisp
+;; GC tuning (SystemCrafters technique): already handled by Doom's gcmh
+;; but ensure LSP performance
+(after! lsp-mode
+  (setq lsp-idle-delay 0.5
+        lsp-log-io nil
+        lsp-enable-file-watchers nil
+        lsp-headerline-breadcrumb-enable t))
+
+;; Defer company completions for speed (SystemCrafters tip)
+(after! company
+  (setq company-idle-delay 0.2
+        company-minimum-prefix-length 2))
 #+end_src
 
 * Quality of Life
@@ -294,4 +396,16 @@
 
 ;; Treemacs width
 (setq treemacs-width 30)
+
+;; Rainbow delimiters in prog modes (from SystemCrafters)
+(add-hook! 'prog-mode-hook #'rainbow-delimiters-mode)
+
+;; Highlight TODO/FIXME in comments (from DistroTube)
+(after! hl-todo
+  (setq hl-todo-keyword-faces
+        '(("TODO"  . (:foreground "#ffd040" :weight bold))
+          ("FIXME" . (:foreground "#ff5050" :weight bold))
+          ("HACK"  . (:foreground "#ff9030" :weight bold))
+          ("NOTE"  . (:foreground "#60c0ff" :weight bold))
+          ("BUG"   . (:foreground "#ff5050" :weight bold)))))
 #+end_src

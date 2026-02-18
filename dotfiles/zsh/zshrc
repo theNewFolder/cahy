@@ -1,126 +1,139 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
-  source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
+typeset -U path cdpath fpath manpath
+
+# Completions
+fpath+=(/usr/share/zsh/site-functions)
+autoload -U compinit && compinit
+
+# Zsh autosuggestions (arch package)
+[[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && \
+  source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+ZSH_AUTOSUGGEST_STRATEGY=(history)
+
+# Zoxide
+command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
+
+# History
+HISTSIZE="100000"
+SAVEHIST="100000"
+HISTFILE="$HOME/.zsh_history"
+mkdir -p "$(dirname "$HISTFILE")"
+
+set_opts=(
+  HIST_FCNTL_LOCK HIST_IGNORE_DUPS HIST_IGNORE_SPACE SHARE_HISTORY
+  NO_APPEND_HISTORY NO_EXTENDED_HISTORY NO_HIST_EXPIRE_DUPS_FIRST
+  NO_HIST_FIND_NO_DUPS NO_HIST_IGNORE_ALL_DUPS NO_HIST_SAVE_NO_DUPS
+)
+for opt in "${set_opts[@]}"; do
+  setopt "$opt"
+done
+unset opt set_opts
+
+# fnm (Fast Node Manager) setup
+if [[ -f "$HOME/.local/share/fnm/fnm" ]]; then
+  export PATH="$HOME/.local/share/fnm:$PATH"
+  eval "$($HOME/.local/share/fnm/fnm env --use-on-cd)"
+fi
+export PATH="$HOME/.local/share/fnm/aliases/default/bin:$PATH"
+
+# gh completion
+command -v gh &>/dev/null && eval "$(gh completion -s zsh)"
+
+# Load API keys from secrets
+_load_secrets() {
+  setopt local_options nullglob
+  for f in ~/.secrets/*_api_key ~/.secrets/*-api-key.txt; do
+    [[ -f "$f" ]] || continue
+    local varname=$(basename "$f" | sed 's/[-.]/_/g; s/_txt$//; s/_api_key$//' | tr '[:lower:]' '[:upper:]')
+    export "${varname}_API_KEY"="$(< "$f")"
+  done
+}
+_load_secrets
+unfunction _load_secrets
+
+# Performance tweaks - cached compinit (only regenerate once per day)
+autoload -Uz compinit
+if [[ -n $HOME/.zcompdump(#qN.mh+24) ]]; then compinit; else compinit -C; fi
+
+KEYTIMEOUT=1
+
+# FZF init
+if [[ $options[zle] = on ]]; then
+  source <(fzf --zsh 2>/dev/null) 2>/dev/null
 fi
 
-# =============================================================================
-#  Zsh Configuration
-#  Migrated from Nix Home Manager
-# =============================================================================
+# FZF theming (Gruvbox)
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --color=bg+:#3c3836,bg:#1d2021,spinner:#ffd040,hl:#ff60d0,fg:#fbf1c7,header:#60c0ff,info:#ffd040,pointer:#ffd040,marker:#ff9030,fg+:#fbf1c7,prompt:#ffd040,hl+:#ff60d0'
 
-# ── History ──
-HISTSIZE=100000
-SAVEHIST=100000
-setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_SPACE
-setopt SHARE_HISTORY
+mkcd() { mkdir -p "$1" && cd "$1"; }
 
-# ── Keybindings ──
-# History search
+# Key bindings
 bindkey '^[[A' history-search-backward
 bindkey '^[[B' history-search-forward
 bindkey '^P' history-search-backward
 bindkey '^N' history-search-forward
-
-# Edit command in $EDITOR
 autoload -z edit-command-line
 zle -N edit-command-line
 bindkey '^X^E' edit-command-line
 
-# ── Performance ──
-# Cached compinit (only regenerate once per day)
-autoload -Uz compinit
-if [[ -n $HOME/.zcompdump(#qN.mh+24) ]]; then
-  compinit
-else
-  compinit -C
-fi
-KEYTIMEOUT=1
-
-# ── Environment ──
-export EDITOR="emacsclient -t"
-export VISUAL="emacsclient -c"
-export PAGER="bat --style=plain"
-export MOZ_ENABLE_WAYLAND="1"
-export QT_QPA_PLATFORM="wayland"
-export PATH="$HOME/.local/bin:$HOME/bin:$HOME/.config/emacs/bin:$PATH"
-
-# ── Aliases ──
-# Modern CLI
-alias ls="eza --icons --group-directories-first"
-alias ll="eza -la --icons --group-directories-first"
-alias lt="eza --tree --icons -L 2"
-alias cat="bat --style=plain"
-alias top="btop"
-alias ..="cd .."
-alias ...="cd ../.."
-
-# Git
-alias g="git"
-alias gs="git status"
-alias gc="git commit"
-alias gp="git push"
-alias gd="git diff"
-alias glog="git log --oneline --graph --decorate -10"
-
-# AI Tools
-alias aic="ai-commit"
-alias air="ai-review"
-alias aie="ai-explain"
-alias aif="ai-fix"
-alias ais="ai-summarize"
-alias ait="ai-test"
-alias aip="ai-pr"
-alias aid="ai-doc"
-alias "ai?"="gemini"
-alias claude="claude"
-
-# Emacs / Doom
-alias e="emacsclient -c -a emacs"
-alias et="emacsclient -t -a emacs"
-alias doom="~/.config/emacs/bin/doom"
-alias doom-sync="~/.config/emacs/bin/doom sync"
-alias doom-upgrade="~/.config/emacs/bin/doom upgrade"
-alias doom-doctor="~/.config/emacs/bin/doom doctor"
-alias doom-tangle="~/.config/emacs/bin/doom tangle ~/.config/doom/config.org"
-alias magit="emacsclient -c -e '(magit-status)' -a emacs"
-alias org-agenda="emacsclient -c -e '(org-agenda nil "d")' -a emacs"
-alias org-capture="emacsclient -c -e '(org-capture)' -a emacs"
-alias org-roam="emacsclient -c -e '(org-roam-node-find)' -a emacs"
-
-# ── Tool Integrations ──
-
-# FNM (Fast Node Manager)
-if [[ -f "$HOME/.local/share/fnm/fnm" ]]; then
-  export PATH="$HOME/.local/share/fnm:$PATH"
-  eval "$($HOME/.local/share/fnm/fnm env --use-on-cd)"
-  export PATH="$HOME/.local/share/fnm/aliases/default/bin:$PATH"
-fi
-
-# Starship
-if command -v starship >/dev/null 2>&1; then
+# Starship prompt
+if [[ $TERM != "dumb" ]] && command -v starship &>/dev/null; then
   eval "$(starship init zsh)"
 fi
 
-# FZF
-if command -v fzf >/dev/null 2>&1; then
-  source <(fzf --zsh 2>/dev/null) 2>/dev/null
-  # FZF theming (Gruvbox)
-  export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
-  export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --color=bg+:#3c3836,bg:#282828,spinner:#d79921,hl:#b16286,fg:#ebdbb2,header:#458588,info:#d79921,pointer:#d79921,marker:#fe8019,fg+:#ebdbb2,prompt:#d79921,hl+:#b16286'
-fi
-
-# Zoxide
-if command -v zoxide >/dev/null 2>&1; then
-  eval "$(zoxide init zsh)"
-fi
-
 # Direnv
-if command -v direnv >/dev/null 2>&1; then
-  eval "$(direnv hook zsh)"
-fi
+command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
 
-# Helper functions
-mkcd() { mkdir -p "$1" && cd "$1"; }
+# Aliases
+alias ..='cd ..'
+alias ...='cd ../..'
+alias 'ai?'=gemini
+alias aic=ai-commit aid=ai-doc aie=ai-explain aif=ai-fix
+alias aip=ai-pr air=ai-review ais=ai-summarize ait=ai-test
+alias akl=ai-learn akn=ai-note
+alias bat80='sudo asusctl -c 80'
+alias cat='bat --style=plain'
+alias claude=claude
+alias cpu-freq="watch -n1 'cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq | sort -n'"
+alias cpu-gov='cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor'
+alias cpu-temp=sensors
+alias doom='~/.config/emacs/bin/doom'
+alias doom-doctor='~/.config/emacs/bin/doom doctor'
+alias doom-sync='~/.config/emacs/bin/doom sync'
+alias doom-tangle='~/.config/emacs/bin/doom tangle ~/.doom.d/config.org'
+alias doom-upgrade='~/.config/emacs/bin/doom upgrade'
+alias e='emacsclient -c -a emacs'
+alias et='emacsclient -t -a emacs'
+alias fan-balanced='sudo asusctl profile -P Balanced'
+alias fan-perf='sudo asusctl profile -P Performance'
+alias fan-quiet='sudo asusctl profile -P Quiet'
+alias g=git gc='git commit' gd='git diff' gp='git push' gs='git status'
+alias ghb='gh browse' gist='gh gist create' gists='gh gist list'
+alias glog='git log --oneline --graph --decorate -10'
+alias gpu-info=nvidia-smi gpu-top=nvtop
+alias gpu-watch='watch -n1 nvidia-smi'
+alias issue='gh issue create' issues='gh issue list' issuev='gh issue view --web'
+alias knowledge='emacsclient -c ~/ai-knowledge -a emacs'
+alias ll='eza -la --icons --group-directories-first'
+alias ls='eza --icons --group-directories-first'
+alias lt='eza --tree --icons -L 2'
+alias magit="emacsclient -c -e '(magit-status)' -a emacs"
+alias org-agenda="emacsclient -c -e '(org-agenda nil \"d\")' -a emacs"
+alias org-capture="emacsclient -c -e '(org-capture)' -a emacs"
+alias org-roam="emacsclient -c -e '(org-roam-node-find)' -a emacs"
+alias perf-balanced='sudo optimize-balanced'
+alias perf-max='sudo optimize-system'
+alias perf-setup='sudo setup-kernel-perf'
+alias pr='gh pr create' prc='gh pr checkout' prd='gh pr diff'
+alias prm='gh pr merge' prs='gh pr list' prv='gh pr view --web'
+alias repo='gh repo view --web' repos='gh repo list'
+alias scx-start='sudo scx_bpfland -s 500 &'
+alias scx-status="pgrep -a scx_ || echo 'No sched-ext scheduler running'"
+alias scx-stop='sudo pkill -f scx_' scx-top=scxtop
+alias today="emacsclient -c -e '(org-roam-dailies-goto-today)' -a emacs"
+alias top=btop
+
+# Zsh syntax highlighting (must be last)
+[[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && \
+  source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main)

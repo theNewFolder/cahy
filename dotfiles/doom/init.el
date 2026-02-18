@@ -43,7 +43,7 @@
        syntax            ; tasing you for every semicolon you forget
 
        :tools
-       direnv
+       direnv            ; shell env per-project
        (eval +overlay)   ; run code, run (also, determine per-project REPLs)
        lookup            ; navigate your code and its documentation
        lsp               ; M-x vscode
@@ -60,7 +60,7 @@
        emacs-lisp        ; drown in parentheses
        json              ; At least it ain't XML
        (javascript +tree-sitter) ; all(noise alarm alarm alarm) of the alarm bells
-       (nix +tree-sitter) ; I hereby declare "nix combinator"
+       ;;(nix +tree-sitter) ; removed — nix uninstalled
        (org              ; organize your plain life in plain text
         +roam            ; wandering org notes
         +pretty          ; yessss
