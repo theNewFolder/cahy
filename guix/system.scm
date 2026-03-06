@@ -10,10 +10,11 @@
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages nvidia)
   #:use-module (nongnu packages mozilla)
+  #:use-module (nongnu services nvidia)
   #:use-module (nongnu system linux-initrd))
 
-(use-service-modules desktop networking ssh xorg pm mcron)
-(use-package-modules emacs gnome linux node shells wm freedesktop file-systems)
+(use-service-modules desktop linux networking shepherd ssh xorg pm mcron)
+(use-package-modules certs curl emacs file-systems gnome linux node shells web-browsers wget wm freedesktop version-control)
 
 (operating-system
   ;; ── Kernel (nonguix for NVIDIA) ──
@@ -91,27 +92,26 @@
                                                "resume")))
                             (documentation "NVIDIA resume handler."))))
 
-     ;; greetd + tuigreet (replaces GDM)
+     ;; greetd + agreety (replaces GDM)
      (service greetd-service-type
               (greetd-configuration
                (greeter-supplementary-groups '("video" "input"))
                (terminals
                 (list
                  (greetd-terminal-configuration
-                  (terminal-vt "1")
+                  (terminal-vt "7")
                   (terminal-switch #t)
                   (default-session-command
-                    (greetd-tuigreet-session
-                     (command (file-append hyprland "/bin/Hyprland")))))
-                 ;; Fallback TTY on vt2
+                    (greetd-agreety-session
+                     (command (greetd-user-session
+                               (command (file-append hyprland "/bin/Hyprland"))
+                               (command-args '())
+                               (xdg-session-type "wayland"))))))
+                 ;; Fallback TTY on vt8
                  (greetd-terminal-configuration
-                  (terminal-vt "2"))))))
+                  (terminal-vt "8"))))))
 
-     ;; Networking
-     (service network-manager-service-type)
-     (service wpa-supplicant-service-type)
-
-     ;; SSH
+     ;; SSH (network-manager + wpa-supplicant already in %desktop-services)
      (service openssh-service-type)
 
      ;; Power management (TLP for laptop battery/thermals)
@@ -128,32 +128,30 @@
                (jobs (list
                       ;; Weekly: keep only last 5 system generations (Sunday 4am)
                       #~(job '(next-day-from (next-hour '(4)) 0)
-                             (string-append #$guix "/bin/guix system delete-generations 5d")
-                             "system-gen-cleanup")))))
+                             "/run/current-system/profile/bin/guix system delete-generations 5d"
+                             "system-gen-cleanup"))))))
 
-     ;; Substitute servers + guix.moe mirrors
-     (modify-services %base-services
-       (guix-service-type
-        config => (guix-configuration
-                   (inherit config)
-                   (substitute-urls
-                    '("https://bordeaux.guix.gnu.org"
-                      "https://ci.guix.gnu.org"
-                      "https://substitutes.nonguix.org"
-                      "https://cache-us-lax.guix.moe"
-                      "https://cache-sg.guix.moe"))
-                   (extra-options '("--max-jobs=4"
-                                    "--cores=8"))
-                   (authorized-keys
-                    (append
-                     (list (plain-file "nonguix.pub"
-                             "(public-key
-                               (ecc
-                                (curve Ed25519)
-                                (q #C1FD53E5D4CE971933EC50C9F307AE2171A2D3B52C804642A7A35F84F3A4EA98#)))"))
-                     %default-authorized-guix-keys))))))
-    ;; Desktop services WITHOUT GDM (greetd replaces it)
+    ;; Desktop services — customized substitutes, no GDM (greetd replaces it)
     (modify-services %desktop-services
+      (guix-service-type
+       config => (guix-configuration
+                  (inherit config)
+                  (substitute-urls
+                   '("https://bordeaux.guix.gnu.org"
+                     "https://ci.guix.gnu.org"
+                     "https://substitutes.nonguix.org"
+                     "https://cache-us-lax.guix.moe"
+                     "https://cache-sg.guix.moe"))
+                  (extra-options '("--max-jobs=4"
+                                   "--cores=8"))
+                  (authorized-keys
+                   (append
+                    (list (plain-file "nonguix.pub"
+                            "(public-key
+                              (ecc
+                               (curve Ed25519)
+                               (q #C1FD53E5D4CE971933EC50C9F307AE2171A2D3B52C804642A7A35F84F3A4EA98#)))"))
+                    %default-authorized-guix-keys))))
       (delete gdm-service-type))))
 
   ;; ── Bootloader (UEFI) ──
