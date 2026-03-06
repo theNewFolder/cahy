@@ -379,7 +379,7 @@
   :ensure nil
   :config
   ;; Claude backend (default)
-  (setq gptel-model 'claude-sonnet-4-20250514
+  (setq gptel-model 'claude-sonnet-4-6-20250514
         gptel-backend
         (gptel-make-anthropic "Claude"
           :stream t
@@ -389,8 +389,9 @@
   (gptel-make-gemini "Gemini"
     :stream t
     :key (lambda () (getenv "GEMINI_API_KEY"))
-    :models '(gemini-2.0-flash
-              gemini-2.0-pro))
+    :models '(gemini-2.5-flash
+              gemini-2.5-pro
+              gemini-2.0-flash))
 
   ;; Quick model switcher
   (defun my/gptel-switch-backend ()
@@ -399,10 +400,10 @@
     (if (string= (gptel-backend-name gptel-backend) "Claude")
         (progn
           (setq gptel-backend (gptel-get-backend "Gemini")
-                gptel-model 'gemini-2.0-flash)
+                gptel-model 'gemini-2.5-flash)
           (message "Switched to Gemini"))
       (setq gptel-backend (gptel-get-backend "Claude")
-            gptel-model 'claude-sonnet-4-20250514)
+            gptel-model 'claude-sonnet-4-6-20250514)
       (message "Switched to Claude"))))
 
 ;;;; ──────────────────────────────────────────────────────────
