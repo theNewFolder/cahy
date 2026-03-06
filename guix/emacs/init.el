@@ -201,7 +201,8 @@
     "g l" '(magit-log-current :which-key "log")
     "g d" '(magit-diff :which-key "diff")
     "g f" '(magit-fetch :which-key "fetch")
-    "g F" '(forge-pull :which-key "forge pull"))
+    "g F" '(forge-pull :which-key "forge pull")
+    "g t" '(git-timemachine :which-key "timemachine"))
 
   ;; AI
   (my/leader
@@ -322,6 +323,22 @@
         corfu-cycle t
         corfu-quit-no-match 'separator))
 
+;; LEARNING: cape adds more completion-at-point functions to corfu.
+;; file paths, dabbrev (buffer words), elisp symbols, etc.
+(use-package cape
+  :ensure nil
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file))
+
+;; Better help buffers (from gunix manifest)
+(use-package helpful
+  :ensure nil
+  :bind
+  ([remap describe-function] . helpful-callable)
+  ([remap describe-variable] . helpful-variable)
+  ([remap describe-key] . helpful-key))
+
 ;;;; ──────────────────────────────────────────────────────────
 ;;;; Git — Magit + Forge
 ;;;; ──────────────────────────────────────────────────────────
@@ -336,6 +353,11 @@
 (use-package forge
   :ensure nil
   :after magit)
+
+;; LEARNING: git-timemachine lets you walk through a file's git history.
+;; Press n/p to move between commits, q to quit.
+(use-package git-timemachine
+  :ensure nil)
 
 ;; Show git changes in the fringe
 (use-package diff-hl
@@ -420,6 +442,34 @@
           ("b" "Bookmark" entry (file "~/org/bookmarks.org")
            "* %? :bookmark:\n%U\n%a\n** Notes: " :empty-lines 1))))
 
+;; Org beautification (from gunix + doom config)
+(use-package org-modern
+  :ensure nil
+  :hook (org-mode . org-modern-mode)
+  :config
+  (setq org-modern-star '("◉" "○" "◈" "◇" "▸")))
+
+(use-package org-appear
+  :ensure nil
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autolinks t
+        org-appear-autosubmarkers t))
+
+(use-package org-superstar
+  :ensure nil
+  :hook (org-mode . org-superstar-mode))
+
+;; LEARNING: org-roam-ui gives you a web-based graph visualization
+;; of your knowledge network. Run M-x org-roam-ui-mode to open it.
+(use-package org-roam-ui
+  :ensure nil
+  :after org-roam
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t))
+
 (use-package org-roam
   :ensure nil
   :config
@@ -449,6 +499,26 @@
 ;; LEARNING: Eglot is built into Emacs 29+ — it's the lightweight LSP client.
 ;; Tree-sitter provides fast, incremental syntax highlighting.
 ;; Both are part of core Emacs now, Guix provides the grammar packages.
+
+;; Snippets (from gunix manifest)
+(use-package yasnippet
+  :ensure nil
+  :config
+  (yas-global-mode 1))
+
+(use-package yasnippet-snippets
+  :ensure nil
+  :after yasnippet)
+
+;; Syntax checking
+(use-package flycheck
+  :ensure nil
+  :hook (prog-mode . flycheck-mode))
+
+;; Highlight TODOs in code
+(use-package hl-todo
+  :ensure nil
+  :hook (prog-mode . hl-todo-mode))
 
 (use-package eglot
   :ensure nil
@@ -602,7 +672,14 @@
     "G p" '((lambda () (interactive)
               (async-shell-command "guix pull"))
             :which-key "guix pull")
-    "G e" '(geiser :which-key "Guile REPL")))
+    "G e" '(geiser :which-key "Guile REPL")
+    "G g" '(guix :which-key "Guix interface")
+    "G i" '(guix-packages-by-name :which-key "search packages")))
+
+;; LEARNING: emacs-guix lets you browse, search, and manage Guix packages
+;; entirely from within Emacs. SPC G g opens the main interface.
+(use-package guix
+  :ensure nil)
 
 ;;;; ──────────────────────────────────────────────────────────
 ;;;; Auto-open daily note on startup

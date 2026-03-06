@@ -63,37 +63,46 @@
    (list
     ;; ── Emacs (Guix-native, no Doom) ──
     "emacs-next-pgtk"
-    ;; Evil (vim keybindings)
+    ;; Evil (vim keybindings) — matches gunix manifest
     "emacs-evil" "emacs-evil-collection"
     "emacs-evil-surround" "emacs-evil-commentary"
-    ;; Completion (VCO stack)
+    "emacs-undo-tree"
+    ;; Completion (Vertico stack — from gunix manifest)
     "emacs-vertico" "emacs-consult" "emacs-orderless"
-    "emacs-marginalia" "emacs-embark" "emacs-corfu"
+    "emacs-marginalia" "emacs-embark" "emacs-corfu" "emacs-cape"
     ;; Keybindings
-    "emacs-general" "emacs-which-key"
-    ;; Git
+    "emacs-general" "emacs-which-key" "emacs-helpful"
+    ;; Git (Magit stack — from gunix manifest)
     "emacs-magit" "emacs-forge" "emacs-diff-hl"
-    ;; Org-mode + Roam
-    "emacs-org-roam"
+    "emacs-git-timemachine" "emacs-git-link"
+    ;; Org-mode + Roam (full PKM — from gunix + doom config)
+    "emacs-org-roam" "emacs-org-roam-ui"
+    "emacs-org-modern" "emacs-org-appear" "emacs-org-superstar"
+    "emacs-org-download" "emacs-visual-fill-column"
     ;; AI
     "emacs-gptel"
-    ;; LSP + tree-sitter
+    ;; LSP + Development (from gunix manifest)
     "emacs-treesit-auto"
-    ;; Languages
+    "emacs-flycheck"
+    "emacs-yasnippet" "emacs-yasnippet-snippets"
+    ;; Languages (from gunix manifest)
     "emacs-geiser" "emacs-geiser-guile"  ;Guile Scheme
     "emacs-rust-mode"
-    "emacs-markdown-mode" "emacs-yaml-mode"
+    "emacs-markdown-mode" "emacs-yaml-mode" "emacs-json-mode"
     ;; Terminal
     "emacs-vterm" "emacs-vterm-toggle"
-    ;; UI
-    "emacs-doom-modeline" "emacs-nerd-icons"
-    "emacs-catppuccin-theme" "emacs-dashboard"
-    "emacs-writeroom-mode" "emacs-rainbow-delimiters"
+    ;; UI (theme + modeline + icons)
+    "emacs-doom-modeline" "emacs-nerd-icons" "emacs-all-the-icons"
+    "emacs-catppuccin-theme" "emacs-doom-themes"
+    "emacs-dashboard" "emacs-writeroom-mode"
+    "emacs-rainbow-delimiters" "emacs-hl-todo"
     ;; Email
     "emacs-mu4e-alert"
     "mu" "isync"                        ;mail indexer + IMAP sync
+    ;; Code quality (from gunix manifest)
+    "emacs-smartparens" "emacs-ws-butler" "emacs-wgrep"
     ;; Utils
-    "emacs-direnv"
+    "emacs-direnv" "emacs-envrc"
     ;; Guix integration
     "emacs-guix"                        ;browse Guix packages from Emacs
 
