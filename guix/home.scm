@@ -99,6 +99,10 @@
     ;; Email
     "emacs-mu4e-alert"
     "mu" "isync"                        ;mail indexer + IMAP sync
+    ;; File management
+    "emacs-dirvish"                      ;dired enhanced with icons, preview
+    ;; Chat (Matrix protocol)
+    "emacs-ement"                        ;Matrix client in Emacs
     ;; Code quality (from gunix manifest)
     "emacs-smartparens" "emacs-ws-butler" "emacs-wgrep"
     ;; Utils
@@ -142,6 +146,9 @@
     "font-fira-code"
     "font-google-noto"
     "font-google-noto-emoji"
+
+    ;; ── Filesystem ──
+    "snapper"                            ;btrfs snapshot management
 
     ;; ── System ──
     "man-pages" "file" "tree" "unzip" "zip"
@@ -242,10 +249,13 @@ fpath+=($HOME/.guix-home/profile/share/zsh/site-functions)
          "ai-review" "ai-screenshot" "ai-summarize" "ai-test"
          "ai-waybar-status" "asus-boost-toggle" "asus-gpu-switch"
          "asus-power-auto" "asus-waybar-status" "gpu-stats"
-         "power-menu" "wallpaper-rotate" "yubikey-lock.sh")))
+         "guix-snapshot" "power-menu" "wallpaper-rotate" "yubikey-lock.sh")))
 
 (define %home-files
   (append
+   ;; mbsync config for mu4e email
+   (list `(".mbsyncrc"
+           ,(local-file (string-append %dotfiles-dir "/mbsync/mbsyncrc"))))
    ;; Gemini MCP server for Claude Code
    (list `(".local/share/gemini-mcp/server.js"
            ,(local-file (string-append %cahy-dir
@@ -293,7 +303,11 @@ fpath+=($HOME/.guix-home/profile/share/zsh/site-functions)
    ;; Monthly store optimization
    #~(job '(next-day-from (next-hour '(4)) 1)
           (string-append #$guix "/bin/guix gc --optimize")
-          "guix-optimize-monthly")))
+          "guix-optimize-monthly")
+   ;; Weekly: keep only last 5 home generations
+   #~(job '(next-day-from (next-hour '(3)) 0)
+          (string-append #$guix "/bin/guix home delete-generations 5d")
+          "guix-home-cleanup-weekly")))
 
 ;; ────────────────────────────────────────────────────────────
 ;; SECRETS STRATEGY

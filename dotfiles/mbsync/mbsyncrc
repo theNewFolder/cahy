@@ -1,0 +1,32 @@
+# mbsync configuration — Gmail IMAP sync for mu4e
+# Requires: Google App Password (not regular password)
+# Create at: https://myaccount.google.com/apppasswords
+# Store password in ~/.secrets/gmail_app_password
+#
+# First-time setup:
+#   mbsync -a                    # initial full sync
+#   mu init --maildir=~/Mail --my-address=omranaltunaiji@gmail.com
+#   mu index
+
+IMAPAccount gmail
+Host imap.gmail.com
+User omranaltunaiji@gmail.com
+PassCmd "cat ~/.secrets/gmail_app_password"
+SSLType IMAPS
+CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+IMAPStore gmail-remote
+Account gmail
+
+MaildirStore gmail-local
+Subfolders Verbatim
+Path ~/Mail/Gmail/
+Inbox ~/Mail/Gmail/Inbox
+
+Channel gmail
+Far :gmail-remote:
+Near :gmail-local:
+Patterns * !"[Gmail]/All Mail"
+Create Both
+Expunge Both
+SyncState *

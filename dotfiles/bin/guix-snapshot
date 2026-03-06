@@ -1,0 +1,19 @@
+#!/bin/sh
+# guix-snapshot — Create a btrfs snapshot before system changes
+# Usage: guix-snapshot [description]
+# Integrates with snapper for automatic cleanup
+
+DESC="${1:-manual snapshot}"
+
+if command -v snapper >/dev/null 2>&1; then
+    sudo snapper -c root create --description "$DESC" --type single
+    echo "Snapshot created: $DESC"
+    snapper -c root list --columns number,date,description | tail -5
+else
+    # Fallback: manual btrfs snapshot
+    TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+    SNAP_DIR="/.snapshots"
+    sudo mkdir -p "$SNAP_DIR"
+    sudo btrfs subvolume snapshot / "$SNAP_DIR/$TIMESTAMP-${DESC// /-}"
+    echo "Manual snapshot: $SNAP_DIR/$TIMESTAMP-${DESC// /-}"
+fi

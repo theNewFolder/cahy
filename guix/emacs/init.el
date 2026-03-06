@@ -643,6 +643,54 @@
   :hook (prog-mode . rainbow-delimiters-mode))
 
 ;;;; ──────────────────────────────────────────────────────────
+;;;; File management — Dirvish (enhanced dired)
+;;;; ──────────────────────────────────────────────────────────
+
+;; LEARNING: Dirvish enhances dired with file preview, icons, git info,
+;; and a modern UI. It replaces the need for external file managers
+;; for most tasks. Use SPC f d to jump to dired, then use dirvish features.
+(use-package dirvish
+  :ensure nil
+  :init (dirvish-override-dired-mode 1)
+  :config
+  (setq dirvish-attributes '(nerd-icons file-size collapse subtree-state vc-state git-msg)
+        dirvish-mode-line-format '(:left (sort symlink) :right (omit yank index))
+        dirvish-preview-dispatchers '(image gif video audio epub archive)
+        dirvish-default-layout '(0 0.4 0.6))  ; no parent, 40% current, 60% preview
+  (dirvish-peek-mode 1)                        ; auto-preview on cursor move
+  ;; Evil-friendly keybindings in dirvish
+  (evil-define-key 'normal dirvish-mode-map
+    (kbd "h") 'dired-up-directory
+    (kbd "l") 'dired-find-file
+    (kbd "q") 'dirvish-quit
+    (kbd "TAB") 'dirvish-subtree-toggle
+    (kbd "s") 'dirvish-quicksort
+    (kbd "y") 'dirvish-yank-menu
+    (kbd "/") 'dirvish-narrow))
+
+;;;; ──────────────────────────────────────────────────────────
+;;;; Chat — Ement (Matrix client)
+;;;; ──────────────────────────────────────────────────────────
+
+;; LEARNING: Ement is a Matrix protocol client for Emacs.
+;; Matrix is a decentralized chat protocol (like Discord/Slack but open).
+;; Connect to any Matrix server (matrix.org, Element, etc).
+;; First-time: M-x ement-connect, enter your homeserver + credentials.
+(use-package ement
+  :ensure nil
+  :config
+  (setq ement-save-sessions t              ; persist sessions across restarts
+        ement-room-send-message-filter 'ement-room-send-org-filter)) ; org formatting
+
+;; Add chat to leader keys
+(with-eval-after-load 'general
+  (my/leader
+    "C"   '(:ignore t :which-key "chat")
+    "C c" '(ement-connect :which-key "connect Matrix")
+    "C r" '(ement-room-list :which-key "room list")
+    "C d" '(ement-disconnect :which-key "disconnect")))
+
+;;;; ──────────────────────────────────────────────────────────
 ;;;; Guile Scheme helpers (for learning Guix)
 ;;;; ──────────────────────────────────────────────────────────
 

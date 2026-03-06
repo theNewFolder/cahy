@@ -9,10 +9,11 @@
   #:use-module (gnu system setuid)
   #:use-module (nongnu packages linux)
   #:use-module (nongnu packages nvidia)
+  #:use-module (nongnu packages mozilla)
   #:use-module (nongnu system linux-initrd))
 
-(use-service-modules desktop networking ssh xorg pm)
-(use-package-modules emacs gnome linux node shells wm freedesktop)
+(use-service-modules desktop networking ssh xorg pm mcron)
+(use-package-modules emacs gnome linux node shells wm freedesktop file-systems)
 
 (operating-system
   ;; ── Kernel (nonguix for NVIDIA) ──
@@ -56,7 +57,9 @@
      nvidia-driver
      xdg-utils
      xdg-desktop-portal
-     xdg-desktop-portal-hyprland)
+     xdg-desktop-portal-hyprland
+     snapper                            ;btrfs snapshot management (needs root)
+     firefox)                           ;Firefox from nonguix (nonfree)
     %base-packages))
 
   ;; ── Services ──
@@ -118,6 +121,15 @@
                (cpu-scaling-governor-on-bat (list "powersave"))
                (cpu-boost-on-ac? #t)
                (cpu-boost-on-bat? #f)))
+
+     ;; Mcron — system maintenance
+     (service mcron-service-type
+              (mcron-configuration
+               (jobs (list
+                      ;; Weekly: keep only last 5 system generations (Sunday 4am)
+                      #~(job '(next-day-from (next-hour '(4)) 0)
+                             (string-append #$guix "/bin/guix system delete-generations 5d")
+                             "system-gen-cleanup")))))
 
      ;; Substitute servers + guix.moe mirrors
      (modify-services %base-services
