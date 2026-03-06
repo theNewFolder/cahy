@@ -697,6 +697,19 @@
 ;; LEARNING: These help you work with Guix config files.
 ;; guix-mode provides Guix-specific features in Scheme buffers.
 
+(defun my/guix-safe-reconfigure ()
+  "Create a btrfs snapshot, then run guix home reconfigure."
+  (interactive)
+  (let ((buf (get-buffer-create "*guix-reconfigure*")))
+    (with-current-buffer buf (erase-buffer))
+    (async-shell-command
+     (concat "guix-snapshot 'pre-reconfigure' && "
+             "guix home reconfigure ~/cahy/guix/home.scm "
+             "--substitute-urls='https://bordeaux.guix.gnu.org "
+             "https://ci.guix.gnu.org https://substitutes.nonguix.org'")
+     buf)
+    (message "Snapshot created, reconfiguring...")))
+
 (defun my/guix-edit-system ()
   "Open the Guix system configuration."
   (interactive)
@@ -713,10 +726,7 @@
     "G"   '(:ignore t :which-key "Guix")
     "G s" '(my/guix-edit-system :which-key "system.scm")
     "G h" '(my/guix-edit-home :which-key "home.scm")
-    "G r" '((lambda () (interactive)
-              (async-shell-command
-               "guix home reconfigure ~/cahy/guix/home.scm"))
-            :which-key "home reconfigure")
+    "G r" '(my/guix-safe-reconfigure :which-key "home reconfigure")
     "G p" '((lambda () (interactive)
               (async-shell-command "guix pull"))
             :which-key "guix pull")
