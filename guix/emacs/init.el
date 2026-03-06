@@ -832,6 +832,28 @@
 ;;;; Guile Scheme learning enhancements
 ;;;; ──────────────────────────────────────────────────────────
 
+;; Info manual shortcuts — quick access to Guix, Guile, Emacs docs
+(defun my/info-guix ()
+  "Open the Guix reference manual."
+  (interactive)
+  (info "(guix)"))
+
+(defun my/info-guile ()
+  "Open the Guile reference manual."
+  (interactive)
+  (info "(guile)"))
+
+(defun my/info-emacs ()
+  "Open the Emacs manual."
+  (interactive)
+  (info "(emacs)"))
+
+(with-eval-after-load 'general
+  (my/leader
+    "h g" '(my/info-guix :which-key "Guix manual")
+    "h r" '(my/info-guile :which-key "Guile reference")
+    "h e" '(my/info-emacs :which-key "Emacs manual")))
+
 ;; LEARNING: eldoc shows function signatures in the minibuffer as you type.
 ;; Built into Emacs, works with geiser for Scheme.
 (add-hook 'scheme-mode-hook #'eldoc-mode)

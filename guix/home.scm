@@ -233,6 +233,9 @@ fpath+=($HOME/.guix-home/profile/share/zsh/site-functions)
      ,(local-file (string-append %cahy-dir "/guix/emacs/init.el")))
    `("emacs/banner.txt"
      ,(local-file (string-append %cahy-dir "/guix/emacs/banner.txt")))
+   ;; Guile learning exercises
+   `("emacs/guile-exercises.org"
+     ,(local-file (string-append %cahy-dir "/guix/learning/guile-exercises.org")))
    `("guix/channels.scm"
      ,(local-file (string-append (getenv "HOME")
                                  "/.config/guix/channels.scm")))))
@@ -251,7 +254,7 @@ fpath+=($HOME/.guix-home/profile/share/zsh/site-functions)
          "ai-review" "ai-screenshot" "ai-summarize" "ai-test"
          "ai-waybar-status" "asus-boost-toggle" "asus-gpu-switch"
          "asus-power-auto" "asus-waybar-status" "gpu-stats"
-         "git-waybar-status" "guix-menu" "guix-snapshot"
+         "git-waybar-status" "guix-health-status" "guix-menu" "guix-snapshot"
          "power-menu" "wallpaper-rotate" "yubikey-lock.sh")))
 
 (define %home-files

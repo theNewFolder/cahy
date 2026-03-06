@@ -1,0 +1,35 @@
+#!/bin/sh
+# guix-health-status — Guix system health for Waybar
+# Shows store size and generation count
+
+STORE_SIZE=$(du -sh /gnu/store 2>/dev/null | cut -f1)
+STORE_BYTES=$(du -sb /gnu/store 2>/dev/null | cut -f1)
+
+# Count system generations
+SYS_GENS=$(ls -1 /var/guix/profiles/system-*-link 2>/dev/null | wc -l)
+HOME_GENS=$(ls -1 /home/dev/.guix-home-*-link 2>/dev/null | wc -l)
+TOTAL_GENS=$((SYS_GENS + HOME_GENS))
+
+# Last gc (modification time of /gnu/store/.links)
+LAST_GC=$(stat -c %Y /gnu/store/.links 2>/dev/null)
+if [ -n "$LAST_GC" ]; then
+    DAYS_SINCE_GC=$(( ($(date +%s) - LAST_GC) / 86400 ))
+    GC_INFO="${DAYS_SINCE_GC}d ago"
+else
+    GC_INFO="never"
+fi
+
+# Warning threshold: 50GB
+WARN_BYTES=53687091200
+if [ -n "$STORE_BYTES" ] && [ "$STORE_BYTES" -gt "$WARN_BYTES" ] 2>/dev/null; then
+    CLASS="warning"
+    ICON="󰀦"
+else
+    CLASS="ok"
+    ICON="󰏗"
+fi
+
+TEXT="$ICON ${STORE_SIZE:-?} (${TOTAL_GENS}g)"
+TOOLTIP="Store: ${STORE_SIZE:-unknown}\nSystem gens: ${SYS_GENS}\nHome gens: ${HOME_GENS}\nLast GC: ${GC_INFO}"
+
+printf '{"text": "%s", "tooltip": "%s", "class": "%s"}\n' "$TEXT" "$TOOLTIP" "$CLASS"

@@ -1,0 +1,171 @@
+#+title: Guile Scheme Exercises for Guix
+#+filetags: :learning:guile:guix:
+#+startup: overview
+
+Learn Guile Scheme by building up to Guix package definitions.
+Evaluate code blocks with =C-c C-c= or =SPC l e= (eval definition).
+
+* Level 1: Basics
+
+** Exercise 1: Hello World
+#+begin_src scheme
+;; Define a function that greets someone by name
+(define (greet name)
+  (format #t "Hello, ~a!\n" name))
+
+(greet "Guix")
+#+end_src
+
+** Exercise 2: Lists — the heart of Lisp
+#+begin_src scheme
+;; Lists are linked pairs (cons cells)
+(define fruits '(apple banana cherry))
+
+;; car = first, cdr = rest
+(display (car fruits))     ; => apple
+(newline)
+(display (cdr fruits))     ; => (banana cherry)
+(newline)
+
+;; map applies a function to each element
+(map symbol->string fruits)  ; => ("apple" "banana" "cherry")
+#+end_src
+
+** Exercise 3: Let bindings
+#+begin_src scheme
+;; let creates local variables
+(let ((x 10)
+      (y 20))
+  (+ x y))  ; => 30
+
+;; let* allows later bindings to reference earlier ones
+(let* ((base 5)
+       (doubled (* base 2)))
+  doubled)  ; => 10
+#+end_src
+
+* Level 2: Pattern Matching & Records
+
+** Exercise 4: Match expressions
+#+begin_src scheme
+(use-modules (ice-9 match))
+
+;; match is Guile's pattern matching (like switch but powerful)
+(define (describe-list lst)
+  (match lst
+    (() "empty list")
+    ((x) (format #f "single element: ~a" x))
+    ((x y) (format #f "pair: ~a and ~a" x y))
+    ((x . rest) (format #f "~a followed by ~a more" x (length rest)))))
+
+(describe-list '())           ; => "empty list"
+(describe-list '(42))         ; => "single element: 42"
+(describe-list '(1 2 3 4))   ; => "1 followed by 3 more"
+#+end_src
+
+** Exercise 5: Records (like structs)
+#+begin_src scheme
+(use-modules (srfi srfi-9))
+
+;; define-record-type creates a new data type
+(define-record-type <person>
+  (make-person name age)
+  person?
+  (name person-name)
+  (age person-age))
+
+(let ((dev (make-person "dev" 25)))
+  (format #t "~a is ~a years old\n"
+          (person-name dev)
+          (person-age dev)))
+#+end_src
+
+* Level 3: Guix Concepts
+
+** Exercise 6: G-expressions (gexp)
+#+begin_src scheme
+;; G-expressions are Guix's way of writing code that runs in the store.
+;; #~ creates a gexp, #$ references a package/derivation.
+;; This is how Guix config files work!
+
+;; In a Guix config, you might write:
+;; (start #~(make-forkexec-constructor
+;;           (list (string-append #$emacs "/bin/emacs") "--fg-daemon")))
+;;
+;; #$emacs gets replaced with the actual store path at build time.
+;; This is how Guix achieves reproducibility!
+#+end_src
+
+** Exercise 7: Simple package definition
+#+begin_src scheme
+;; A Guix package is a record with specific fields.
+;; Here's the structure (don't eval this — it needs Guix modules):
+
+;; (define-public my-hello
+;;   (package
+;;     (name "my-hello")
+;;     (version "1.0")
+;;     (source (local-file "hello.sh"))
+;;     (build-system copy-build-system)
+;;     (arguments
+;;      '(#:install-plan '(("hello.sh" "bin/hello"))))
+;;     (synopsis "A simple hello script")
+;;     (description "Prints hello world.")
+;;     (home-page "https://example.com")
+;;     (license license:gpl3+)))
+;;
+;; Key concepts:
+;; - build-system: how to compile/install (copy, gnu, python, cargo, etc)
+;; - arguments: build-time parameters (#:phases, #:install-plan)
+;; - inputs: runtime dependencies
+;; - native-inputs: build-time only dependencies
+#+end_src
+
+** Exercise 8: Service definition
+#+begin_src scheme
+;; Services in Guix extend the system. Here's the pattern:
+;;
+;; (service-type
+;;   (name 'my-service)
+;;   (extensions
+;;     (list (service-extension shepherd-root-service-type
+;;             my-shepherd-service)))
+;;   (description "My custom service"))
+;;
+;; Shepherd services are daemons managed by GNU Shepherd (like systemd).
+;; They have: provision, requirement, start, stop, respawn?
+;;
+;; Your emacs daemon in home.scm is a shepherd service!
+;; (shepherd-service
+;;   (provision '(emacs))
+;;   (start #~(make-forkexec-constructor ...))
+;;   (stop #~(make-kill-destructor))
+;;   (respawn? #t))
+#+end_src
+
+* Level 4: Practical Guix Hacking
+
+** Exercise 9: Modify home.scm
+Try these in your Guix Home config:
+1. Add a new package: find it with =guix search=, add to =%user-packages=
+2. Add a new env var: add to =%environment-variables=
+3. Add a new script: create in =dotfiles/bin/=, add to =%bin-scripts= list
+4. Test with: =guix home reconfigure ~/cahy/guix/home.scm=
+
+** Exercise 10: Write a Guix channel
+#+begin_src scheme
+;; A channel is a Git repo with Guix package/service definitions.
+;; Structure:
+;;   .guix-channel   — channel metadata
+;;   my-packages.scm — package definitions
+;;
+;; .guix-channel contents:
+;; (channel
+;;   (version 0)
+;;   (url "https://github.com/you/my-channel"))
+;;
+;; Then in channels.scm:
+;; (channel
+;;   (name 'my-channel)
+;;   (url "https://github.com/you/my-channel"))
+#+end_src
