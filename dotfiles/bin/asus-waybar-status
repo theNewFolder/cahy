@@ -1,9 +1,23 @@
 #!/usr/bin/env bash
-# ASUS profile + battery status for waybar
-# Shows current performance profile and charge limit
+# ASUS TUF power profile for waybar
+# Works on Guix (sysfs) and CachyOS (asusctl)
 
-PROFILE=$(asusctl profile get 2>/dev/null | grep -oP 'Active profile: \K\w+' || echo "unknown")
-LIMIT=$(asusctl battery info 2>/dev/null | grep -oP 'charge limit: \K[0-9]+' || echo "?")
+# Try asusctl first (CachyOS/Arch)
+if command -v asusctl &>/dev/null; then
+    PROFILE=$(asusctl profile get 2>/dev/null | grep -oP 'Active profile: \K\w+' || echo "unknown")
+else
+    # Fallback: read platform_profile sysfs (works on Guix)
+    PROFILE=$(cat /sys/firmware/acpi/platform_profile 2>/dev/null || echo "unknown")
+    # Normalize naming
+    case "$PROFILE" in
+        low-power)    PROFILE="Quiet" ;;
+        balanced)     PROFILE="Balanced" ;;
+        performance)  PROFILE="Performance" ;;
+    esac
+fi
+
+# Battery charge limit (ASUS sysfs)
+LIMIT=$(cat /sys/class/power_supply/BAT0/charge_control_end_threshold 2>/dev/null || echo "?")
 
 case "$PROFILE" in
     Quiet)       ICON="󰌪"; CLASS="quiet" ;;

@@ -1,21 +1,29 @@
 #!/usr/bin/env bash
-# Auto power profile switcher for ASUS TUF laptops
-# Switches profiles based on AC/battery state
-# Run via udev rule or systemd path unit
-
+# Auto-select power profile based on AC/battery state
+# Uses platform_profile sysfs (works on Guix without asusctl)
 set -euo pipefail
 
-AC_ONLINE=$(cat /sys/class/power_supply/ACS0/online 2>/dev/null || cat /sys/class/power_supply/AC0/online 2>/dev/null || echo "1")
+AC_ONLINE=$(cat /sys/class/power_supply/ACS0/online 2>/dev/null || cat /sys/class/power_supply/AC0/online 2>/dev/null || cat /sys/class/power_supply/ADP0/online 2>/dev/null || echo "1")
+PROFILE_PATH="/sys/firmware/acpi/platform_profile"
 
-if [[ "$AC_ONLINE" == "1" ]]; then
-    # On AC power — use Balanced (or Performance if gaming)
-    CURRENT=$(asusctl profile get 2>/dev/null | grep -oP 'Active profile: \K\w+')
-    if [[ "$CURRENT" != "Balanced" && "$CURRENT" != "Performance" ]]; then
+if command -v asusctl &>/dev/null; then
+    # CachyOS/Arch path
+    if [[ "$AC_ONLINE" == "1" ]]; then
         asusctl profile set Balanced
-        notify-send "ASUS Profile" "AC connected — Balanced mode" -i battery-full-charging
+        notify-send "Power Profile" "AC — Balanced" -i battery-full-charged
+    else
+        asusctl profile set Quiet
+        notify-send "Power Profile" "Battery — Quiet" -i battery-good
+    fi
+elif [[ -f "$PROFILE_PATH" ]]; then
+    # Guix path — direct sysfs
+    if [[ "$AC_ONLINE" == "1" ]]; then
+        echo "balanced" | sudo tee "$PROFILE_PATH" > /dev/null
+        notify-send "Power Profile" "AC — Balanced" -i battery-full-charged
+    else
+        echo "low-power" | sudo tee "$PROFILE_PATH" > /dev/null
+        notify-send "Power Profile" "Battery — Quiet" -i battery-good
     fi
 else
-    # On battery — switch to Quiet for power saving
-    asusctl profile set Quiet
-    notify-send "ASUS Profile" "Battery — Quiet mode (power saving)" -i battery-low
+    notify-send "Power Profile" "No profile control available" -u low
 fi

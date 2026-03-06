@@ -1,25 +1,36 @@
 #!/usr/bin/env bash
-# Switch GPU modes via supergfxctl with notification
-# Modes: Hybrid (default, power saving), Integrated (no dGPU), AsusMuxDgpu (full dGPU)
-
+# Switch GPU modes on ASUS TUF laptops
+# Uses supergfxctl if available, otherwise uses sysfs/envycontrol
 set -euo pipefail
 
-CURRENT=$(supergfxctl -g 2>/dev/null || echo "Unknown")
+if command -v supergfxctl &>/dev/null; then
+    CURRENT=$(supergfxctl -g 2>/dev/null || echo "Unknown")
+    OPTIONS="󰍹 Hybrid (Power Saving)\n Integrated (iGPU Only)\n󰢮 Dedicated (Full dGPU)"
+    CHOICE=$(echo -e "$OPTIONS" | wofi --dmenu --prompt "GPU Mode (Current: $CURRENT)" --width 350 --height 200 --cache-file /dev/null)
 
-OPTIONS="󰍹 Hybrid (Power Saving)\n Integrated (iGPU Only)\n󰢮 Dedicated (Full dGPU)"
-CHOICE=$(echo -e "$OPTIONS" | wofi --dmenu --prompt "GPU Mode (Current: $CURRENT)" --width 350 --height 200 --cache-file /dev/null)
+    case "$CHOICE" in
+        *Hybrid*)     supergfxctl -m Hybrid; notify-send "GPU Mode" "Switched to Hybrid" ;;
+        *Integrated*) supergfxctl -m Integrated; notify-send "GPU Mode" "Switched to Integrated" ;;
+        *Dedicated*)  supergfxctl -m AsusMuxDgpu; notify-send "GPU Mode" "Switched to Dedicated — reboot required!" -u critical ;;
+    esac
+else
+    # Guix: NVIDIA RTD3 power management via sysfs
+    GPU_STATE=$(cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status 2>/dev/null || echo "unknown")
+    OPTIONS="󰍹 Toggle GPU Power (currently: $GPU_STATE)\n Info"
+    CHOICE=$(echo -e "$OPTIONS" | wofi --dmenu --prompt "GPU Control" --width 350 --height 150 --cache-file /dev/null)
 
-case "$CHOICE" in
-    *Hybrid*)
-        supergfxctl -m Hybrid
-        notify-send "GPU Mode" "Switched to Hybrid — dGPU powers down when idle" -i video-display
-        ;;
-    *Integrated*)
-        supergfxctl -m Integrated
-        notify-send "GPU Mode" "Switched to Integrated — dGPU fully off" -i video-display
-        ;;
-    *Dedicated*)
-        supergfxctl -m AsusMuxDgpu
-        notify-send "GPU Mode" "Switched to Dedicated — full dGPU performance\nReboot required!" -u critical -i video-display
-        ;;
-esac
+    case "$CHOICE" in
+        *Toggle*)
+            if [[ "$GPU_STATE" == "active" ]]; then
+                echo auto | sudo tee /sys/bus/pci/devices/0000:01:00.0/power/control > /dev/null
+                notify-send "GPU" "Set to auto power management"
+            else
+                echo on | sudo tee /sys/bus/pci/devices/0000:01:00.0/power/control > /dev/null
+                notify-send "GPU" "Forced GPU on"
+            fi
+            ;;
+        *Info*)
+            nvidia-smi 2>/dev/null | head -20 | foot -a floating -e less || notify-send "GPU" "nvidia-smi not available"
+            ;;
+    esac
+fi
