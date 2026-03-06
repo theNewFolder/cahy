@@ -9,7 +9,7 @@
 
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["custom/ai-status", "mpris", "custom/separator", "custom/gpu", "cpu", "memory", "temperature", "custom/separator2", "custom/asus-profile", "backlight", "pulseaudio", "network", "battery", "tray"],
+    "modules-right": ["custom/emacs", "custom/ai-status", "mpris", "custom/separator", "custom/gpu", "cpu", "memory", "temperature", "custom/separator2", "custom/asus-profile", "backlight", "pulseaudio", "network", "battery", "tray"],
 
     "hyprland/workspaces": {
         "format": "{icon}",
@@ -122,6 +122,14 @@
     "tray": {
         "icon-size": 16,
         "spacing": 6
+    },
+
+    "custom/emacs": {
+        "exec": "emacsclient --eval '(my/waybar-status)' 2>/dev/null | tr -d '\"' || echo ''",
+        "format": " {}",
+        "interval": 5,
+        "tooltip": false,
+        "on-click": "emacsclient -c -a emacs"
     },
 
     "custom/ai-status": {

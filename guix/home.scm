@@ -124,6 +124,8 @@
     "wofi" "wl-clipboard" "grim" "slurp"
     "wlsunset" "brightnessctl" "playerctl"
     "mako"
+    ;; File manager
+    "yazi"                              ;terminal file manager (Super+T)
 
     ;; ── Development ──
     "node"                              ;Claude Code + MCP servers

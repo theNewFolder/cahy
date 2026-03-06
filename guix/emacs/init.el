@@ -682,6 +682,28 @@
   :ensure nil)
 
 ;;;; ──────────────────────────────────────────────────────────
+;;;; Waybar integration — Emacs status in status bar
+;;;; ──────────────────────────────────────────────────────────
+
+;; LEARNING: This function is called by Waybar's custom/emacs module.
+;; It returns a status string showing what you're doing in Emacs.
+(defun my/waybar-status ()
+  "Return a status string for Waybar."
+  (let ((clock (when (bound-and-true-p org-clock-current-task)
+                 (format "[%s] %s"
+                         (org-duration-from-minutes
+                          (org-clock-get-clocked-time))
+                         (substring-no-properties org-clock-current-task
+                                                  0 (min 30 (length org-clock-current-task))))))
+        (ai (when (bound-and-true-p gptel-backend)
+              (gptel-backend-name gptel-backend)))
+        (buf (buffer-name (current-buffer))))
+    (cond
+     (clock (format "%s" clock))
+     (ai (format "%s | %s" ai (truncate-string-to-width buf 20)))
+     (t (truncate-string-to-width buf 25)))))
+
+;;;; ──────────────────────────────────────────────────────────
 ;;;; Auto-open daily note on startup
 ;;;; ──────────────────────────────────────────────────────────
 
