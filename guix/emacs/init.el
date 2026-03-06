@@ -614,6 +614,30 @@
 (use-package nerd-icons
   :ensure nil)
 
+;; Guix generation info in modeline
+(defvar my/guix-generation nil "Current Guix Home generation.")
+
+(defun my/update-guix-generation ()
+  "Update the Guix generation info for modeline display."
+  (setq my/guix-generation
+        (let ((gen (string-trim
+                    (shell-command-to-string
+                     "readlink ~/.guix-home 2>/dev/null | grep -oP 'guix-home-\\K[0-9]+' || echo '?'"))))
+          (format " G:%s" gen))))
+
+;; Update on startup and after reconfigure
+(add-hook 'emacs-startup-hook #'my/update-guix-generation)
+
+(with-eval-after-load 'doom-modeline
+  (doom-modeline-def-segment guix-gen
+    "Show current Guix Home generation."
+    (when my/guix-generation
+      (propertize my/guix-generation 'face 'doom-modeline-info)))
+  ;; Add to modeline
+  (doom-modeline-def-modeline 'main
+    '(bar workspace-name window-number modals matches follow buffer-info remote-host buffer-position word-count parrot selection-info)
+    '(compilation objed-state misc-info persp-name battery grip irc mu4e gnus github debug repl lsp minor-modes input-method indent-info buffer-encoding major-mode process vcs checker time guix-gen)))
+
 ;; Dashboard with custom ASCII banner
 (use-package dashboard
   :ensure nil

@@ -142,6 +142,9 @@
     "python-lsp-server"                 ;Python LSP
     "rust-analyzer"                     ;Rust LSP
 
+    ;; ── Cursor theme ──
+    "bibata-cursor-theme"                ;modern dark cursor (catppuccin-cursors not in Guix)
+
     ;; ── Fonts ──
     "font-fira-code"
     "font-google-noto"
@@ -176,8 +179,10 @@
     ("GOOGLE_GENAI_USE_GCA" . "true")
     ;; FZF theming (Gruvbox)
     ("FZF_DEFAULT_COMMAND" . "fd --type f --hidden --follow --exclude .git")
-    ;; GTK dark theme preference
+    ;; GTK dark theme + cursor
     ("GTK_THEME" . "Adwaita:dark")
+    ("XCURSOR_THEME" . "Bibata-Modern-Ice")
+    ("XCURSOR_SIZE" . "24")
     ;; FZF theming (Catppuccin Mocha)
     ("FZF_DEFAULT_OPTS" . "--height 40% --layout=reverse --border --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8,fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc,marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8")
     ;; Editor
@@ -258,6 +263,7 @@ fpath+=($HOME/.guix-home/profile/share/zsh/site-functions)
          "ai-review" "ai-screenshot" "ai-summarize" "ai-test"
          "ai-waybar-status" "asus-boost-toggle" "asus-gpu-switch"
          "asus-power-auto" "asus-waybar-status" "gpu-stats"
+         "catppuccin-wallpapers-setup"
          "git-waybar-status" "guix-health-status" "guix-menu" "guix-snapshot"
          "power-menu" "wallpaper-rotate" "yubikey-lock.sh")))
 
@@ -317,7 +323,11 @@ fpath+=($HOME/.guix-home/profile/share/zsh/site-functions)
    ;; Weekly: keep only last 5 home generations
    #~(job '(next-day-from (next-hour '(3)) 0)
           (string-append #$guix "/bin/guix home delete-generations 5d")
-          "guix-home-cleanup-weekly")))
+          "guix-home-cleanup-weekly")
+   ;; Every 30 minutes: rotate wallpaper
+   #~(job '(next-minute-from (next-hour '()) '(0 30))
+          (string-append (getenv "HOME") "/.local/bin/wallpaper-rotate")
+          "wallpaper-rotate")))
 
 ;; ────────────────────────────────────────────────────────────
 ;; SECRETS STRATEGY

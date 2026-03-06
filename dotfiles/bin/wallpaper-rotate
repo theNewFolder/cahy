@@ -2,7 +2,10 @@
 # Rotate wallpaper randomly from ~/Pictures/Wallpapers/
 set -euo pipefail
 
+# Prefer Catppuccin wallpapers if available, fallback to all
+CATDIR="$HOME/Pictures/Wallpapers/catppuccin"
 WALLDIR="$HOME/Pictures/Wallpapers"
+[[ -d "$CATDIR" && "$(ls -A "$CATDIR" 2>/dev/null)" ]] && WALLDIR="$CATDIR"
 WALL=$(find "$WALLDIR" -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.webp" \) | shuf -n 1)
 
 if [[ -z "$WALL" ]]; then

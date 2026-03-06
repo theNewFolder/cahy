@@ -1,0 +1,26 @@
+#!/bin/sh
+# catppuccin-wallpapers-setup — Download Catppuccin wallpapers
+# Run once to populate ~/Pictures/Wallpapers/catppuccin/
+
+DIR="$HOME/Pictures/Wallpapers/catppuccin"
+mkdir -p "$DIR"
+
+if [ "$(ls -A "$DIR" 2>/dev/null)" ]; then
+    echo "Wallpapers already downloaded in $DIR"
+    ls "$DIR" | wc -l
+    echo "files"
+    exit 0
+fi
+
+echo "Downloading Catppuccin wallpapers..."
+cd /tmp
+git clone --depth 1 https://github.com/catppuccin/wallpapers.git catppuccin-walls 2>/dev/null
+
+# Copy mocha-themed wallpapers
+find catppuccin-walls -name "*.png" -o -name "*.jpg" | head -20 | while read f; do
+    cp "$f" "$DIR/"
+done
+
+rm -rf catppuccin-walls
+echo "Downloaded $(ls "$DIR" | wc -l) wallpapers to $DIR"
+echo "Wallpaper rotation will use these automatically."
