@@ -1,13 +1,24 @@
 #!/bin/sh
 # guix-health-status — Guix system health for Waybar
 # Shows store size and generation count
+# Caches store size (expensive du) for 5 minutes
 
-STORE_SIZE=$(du -sh /gnu/store 2>/dev/null | cut -f1)
-STORE_BYTES=$(du -sb /gnu/store 2>/dev/null | cut -f1)
+CACHE_FILE="/tmp/guix-health-cache"
+CACHE_AGE=300
+
+# Use cached store size if recent enough
+if [ -f "$CACHE_FILE" ] && [ "$(( $(date +%s) - $(stat -c %Y "$CACHE_FILE") ))" -lt "$CACHE_AGE" ]; then
+    STORE_SIZE=$(sed -n '1p' "$CACHE_FILE")
+    STORE_BYTES=$(sed -n '2p' "$CACHE_FILE")
+else
+    STORE_SIZE=$(du -sh /gnu/store 2>/dev/null | cut -f1)
+    STORE_BYTES=$(du -sb /gnu/store 2>/dev/null | cut -f1)
+    printf '%s\n%s\n' "$STORE_SIZE" "$STORE_BYTES" > "$CACHE_FILE" 2>/dev/null
+fi
 
 # Count system generations
-SYS_GENS=$(ls -1 /var/guix/profiles/system-*-link 2>/dev/null | wc -l)
-HOME_GENS=$(ls -1 /home/dev/.guix-home-*-link 2>/dev/null | wc -l)
+SYS_GENS=$(ls -1d /var/guix/profiles/system-*-link 2>/dev/null | wc -l)
+HOME_GENS=$(ls -1d "$HOME"/.guix-home-*-link 2>/dev/null | wc -l)
 TOTAL_GENS=$((SYS_GENS + HOME_GENS))
 
 # Last gc (modification time of /gnu/store/.links)
