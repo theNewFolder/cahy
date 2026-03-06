@@ -646,9 +646,9 @@
         dashboard-startup-banner (expand-file-name "~/.config/emacs/banner.txt")
         dashboard-center-content t
         dashboard-vertically-center-content t
-        dashboard-items '((recents . 10)
-                          (projects . 5)
-                          (agenda . 5))
+        dashboard-items '((agenda . 5)
+                          (recents . 10)
+                          (projects . 5))
         dashboard-set-heading-icons t
         dashboard-set-file-icons t
         dashboard-footer-messages
