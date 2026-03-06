@@ -125,7 +125,7 @@
     "curl" "wget"
 
     ;; ── Wayland tools ──
-    "wofi" "wl-clipboard" "grim" "slurp"
+    "wofi" "wl-clipboard" "grim" "slurp" "swappy"
     "wlsunset" "brightnessctl" "playerctl"
     "mako"
     ;; File manager
