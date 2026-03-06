@@ -484,6 +484,21 @@
           ("r" "reference" plain "%?"
            :target (file+head "ref/%<%Y%m%d%H%M%S>-${slug}.org"
                               "#+title: ${title}\n#+filetags: :reference:\n")
+           :unnarrowed t)
+          ("p" "project" plain
+           "* Goals\n%?\n\n* Tasks\n\n* Notes\n"
+           :target (file+head "project-%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+filetags: :project:\n#+category: ${title}\n")
+           :unnarrowed t)
+          ("m" "meeting" plain
+           "* Attendees\n%?\n\n* Agenda\n\n* Action Items\n\n* Notes\n"
+           :target (file+head "meeting-%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+filetags: :meeting:\n#+date: %<%Y-%m-%d>\n")
+           :unnarrowed t)
+          ("b" "book/reading" plain
+           "* Summary\n%?\n\n* Key Ideas\n\n* Quotes\n\n* Related\n"
+           :target (file+head "reading-%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+filetags: :reading:\n#+author: \n")
            :unnarrowed t))
         org-roam-dailies-directory "daily/"
         org-roam-dailies-capture-templates

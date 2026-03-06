@@ -1,18 +1,26 @@
 typeset -U path cdpath fpath manpath
 
-# Completions
+# ── Completions (Guix-compatible paths) ──
+fpath+=($HOME/.guix-home/profile/share/zsh/site-functions)
+fpath+=($HOME/.guix-profile/share/zsh/site-functions)
 fpath+=(/usr/share/zsh/site-functions)
 autoload -U compinit && compinit
 
-# Zsh autosuggestions (arch package)
-[[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && \
-  source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+# ── Zsh plugins (Guix or Arch paths) ──
+for plugin_dir in \
+  "$HOME/.guix-home/profile/share/zsh/plugins" \
+  "/usr/share/zsh/plugins"; do
+  if [[ -d "$plugin_dir/zsh-autosuggestions" ]]; then
+    source "$plugin_dir/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    break
+  fi
+done
 ZSH_AUTOSUGGEST_STRATEGY=(history)
 
 # Zoxide
 command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
 
-# History
+# ── History ──
 HISTSIZE="100000"
 SAVEHIST="100000"
 HISTFILE="$HOME/.zsh_history"
@@ -28,17 +36,13 @@ for opt in "${set_opts[@]}"; do
 done
 unset opt set_opts
 
-# fnm (Fast Node Manager) setup
-if [[ -f "$HOME/.local/share/fnm/fnm" ]]; then
-  export PATH="$HOME/.local/share/fnm:$PATH"
-  eval "$($HOME/.local/share/fnm/fnm env --use-on-cd)"
-fi
-export PATH="$HOME/.local/share/fnm/aliases/default/bin:$PATH"
+# ── Node (Guix provides node, npm-global for user packages) ──
+export PATH="$HOME/.npm-global/bin:$PATH"
 
 # gh completion
 command -v gh &>/dev/null && eval "$(gh completion -s zsh)"
 
-# Load API keys from secrets
+# ── Load API keys from secrets ──
 _load_secrets() {
   setopt local_options nullglob
   for f in ~/.secrets/*_api_key ~/.secrets/*-api-key.txt; do
@@ -50,27 +54,20 @@ _load_secrets() {
 _load_secrets
 unfunction _load_secrets
 
-# Performance tweaks - cached compinit (only regenerate once per day)
+# Performance tweaks - cached compinit
 autoload -Uz compinit
 if [[ -n $HOME/.zcompdump(#qN.mh+24) ]]; then compinit; else compinit -C; fi
 
 KEYTIMEOUT=1
 
-# FZF init
+# ── FZF ──
 if [[ $options[zle] = on ]]; then
   source <(fzf --zsh 2>/dev/null) 2>/dev/null
 fi
 
-# FZF theming (Gruvbox)
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
-export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --color=bg+:#3c3836,bg:#1d2021,spinner:#ffd040,hl:#ff60d0,fg:#fbf1c7,header:#60c0ff,info:#ffd040,pointer:#ffd040,marker:#ff9030,fg+:#fbf1c7,prompt:#ffd040,hl+:#ff60d0'
-
-# Gemini CLI auth (Google Cloud Auth - browser-based)
-export GOOGLE_GENAI_USE_GCA=true
-
 mkcd() { mkdir -p "$1" && cd "$1"; }
 
-# Key bindings
+# ── Key bindings ──
 bindkey '^[[A' history-search-backward
 bindkey '^[[B' history-search-forward
 bindkey '^P' history-search-backward
@@ -79,7 +76,7 @@ autoload -z edit-command-line
 zle -N edit-command-line
 bindkey '^X^E' edit-command-line
 
-# Starship prompt
+# ── Starship prompt ──
 if [[ $TERM != "dumb" ]] && command -v starship &>/dev/null; then
   eval "$(starship init zsh)"
 fi
@@ -87,56 +84,68 @@ fi
 # Direnv
 command -v direnv &>/dev/null && eval "$(direnv hook zsh)"
 
-# Aliases
+# ── Aliases ──
+# Navigation
 alias ..='cd ..'
 alias ...='cd ../..'
-alias 'ai?'=gemini
-alias aic=ai-commit aid=ai-doc aie=ai-explain aif=ai-fix
-alias aip=ai-pr air=ai-review ais=ai-summarize ait=ai-test
-alias akl=ai-learn akn=ai-note
-alias bat80='sudo asusctl -c 80'
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -la --icons --group-directories-first'
+alias lt='eza --tree --icons -L 2'
 alias cat='bat --style=plain'
-alias claude=claude
-alias cpu-freq="watch -n1 'cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq | sort -n'"
-alias cpu-gov='cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor'
-alias cpu-temp=sensors
-alias doom='~/.config/emacs/bin/doom'
-alias doom-doctor='~/.config/emacs/bin/doom doctor'
-alias doom-sync='~/.config/emacs/bin/doom sync'
-alias doom-tangle='~/.config/emacs/bin/doom tangle ~/.doom.d/config.org'
-alias doom-upgrade='~/.config/emacs/bin/doom upgrade'
+alias top=btop
+
+# Emacs (main workflow)
 alias e='emacsclient -c -a emacs'
 alias et='emacsclient -t -a emacs'
-alias fan-balanced='sudo asusctl profile -P Balanced'
-alias fan-perf='sudo asusctl profile -P Performance'
-alias fan-quiet='sudo asusctl profile -P Quiet'
-alias g=git gc='git commit' gd='git diff' gp='git push' gs='git status'
-alias ghb='gh browse' gist='gh gist create' gists='gh gist list'
-alias glog='git log --oneline --graph --decorate -10'
-alias gpu-info=nvidia-smi gpu-top=nvtop
-alias gpu-watch='watch -n1 nvidia-smi'
-alias issue='gh issue create' issues='gh issue list' issuev='gh issue view --web'
-alias knowledge='emacsclient -c ~/ai-knowledge -a emacs'
-alias ll='eza -la --icons --group-directories-first'
-alias ls='eza --icons --group-directories-first'
-alias lt='eza --tree --icons -L 2'
 alias magit="emacsclient -c -e '(magit-status)' -a emacs"
 alias org-agenda="emacsclient -c -e '(org-agenda nil \"d\")' -a emacs"
 alias org-capture="emacsclient -c -e '(org-capture)' -a emacs"
 alias org-roam="emacsclient -c -e '(org-roam-node-find)' -a emacs"
-alias perf-balanced='sudo optimize-balanced'
-alias perf-max='sudo optimize-system'
-alias perf-setup='sudo setup-kernel-perf'
+alias today="emacsclient -c -e '(org-roam-dailies-goto-today)' -a emacs"
+alias knowledge='emacsclient -c ~/ai-knowledge -a emacs'
+
+# Git
+alias g=git gc='git commit' gd='git diff' gp='git push' gs='git status'
+alias glog='git log --oneline --graph --decorate -10'
+alias ghb='gh browse' gist='gh gist create' gists='gh gist list'
+alias issue='gh issue create' issues='gh issue list' issuev='gh issue view --web'
 alias pr='gh pr create' prc='gh pr checkout' prd='gh pr diff'
 alias prm='gh pr merge' prs='gh pr list' prv='gh pr view --web'
 alias repo='gh repo view --web' repos='gh repo list'
-alias scx-start='sudo scx_bpfland -s 500 &'
-alias scx-status="pgrep -a scx_ || echo 'No sched-ext scheduler running'"
-alias scx-stop='sudo pkill -f scx_' scx-top=scxtop
-alias today="emacsclient -c -e '(org-roam-dailies-goto-today)' -a emacs"
-alias top=btop
+
+# AI tools
+alias 'ai?'=gemini
+alias aic=ai-commit aid=ai-doc aie=ai-explain aif=ai-fix
+alias aip=ai-pr air=ai-review ais=ai-summarize ait=ai-test
+alias akl=ai-learn akn=ai-note
+
+# Guix system management
+alias gx='guix'
+alias gxp='guix pull --substitute-urls="https://bordeaux.guix.gnu.org https://ci.guix.gnu.org https://substitutes.nonguix.org"'
+alias gxhr='guix home reconfigure ~/cahy/guix/home.scm'
+alias gxsr='sudo guix system reconfigure ~/cahy/guix/system.scm'
+alias gxs='guix search'
+alias gxi='guix install'
+alias gxr='guix remove'
+alias gxu='guix upgrade'
+alias gxgc='guix gc -F 10G'
+alias gxgen='guix home list-generations'
+alias gxsys='guix system list-generations'
+alias gxdesc='guix describe'
+alias gxshell='guix shell'
+alias gxedit='guix edit'
+
+# System info
+alias cpu-temp='cat /sys/class/thermal/thermal_zone*/temp 2>/dev/null | head -1 | awk "{print \$1/1000\"°C\"}"'
+alias gpu-info='nvidia-smi 2>/dev/null || echo "No NVIDIA GPU"'
 
 # Zsh syntax highlighting (must be last)
-[[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && \
-  source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+for plugin_dir in \
+  "$HOME/.guix-home/profile/share/zsh/plugins" \
+  "/usr/share/zsh/plugins"; do
+  if [[ -d "$plugin_dir/zsh-syntax-highlighting" ]]; then
+    source "$plugin_dir/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    break
+  fi
+done
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main)
