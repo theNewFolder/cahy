@@ -163,7 +163,7 @@
 
   ;; ── File systems — Samsung 990 PRO 2TB (nvme1n1) ──
   ;; Btrfs subvolumes: @, @home, @gnu, @log, @tmp
-  ;; TODO: Update UUIDs after partitioning
+  ;; Using labels (guix-root, GUIX-EFI) — no UUID management needed
   (file-systems
    (cons* (file-system
             (mount-point "/")
