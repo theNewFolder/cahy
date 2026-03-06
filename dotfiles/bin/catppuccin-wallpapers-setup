@@ -6,21 +6,32 @@ DIR="$HOME/Pictures/Wallpapers/catppuccin"
 mkdir -p "$DIR"
 
 if [ "$(ls -A "$DIR" 2>/dev/null)" ]; then
-    echo "Wallpapers already downloaded in $DIR"
-    ls "$DIR" | wc -l
-    echo "files"
+    COUNT=$(ls "$DIR" | wc -l)
+    echo "Wallpapers already present: $COUNT files in $DIR"
     exit 0
 fi
 
 echo "Downloading Catppuccin wallpapers..."
-cd /tmp
-git clone --depth 1 https://github.com/catppuccin/wallpapers.git catppuccin-walls 2>/dev/null
+TMPDIR=$(mktemp -d)
+git clone --depth 1 https://github.com/catppuccin/wallpapers.git "$TMPDIR/walls" 2>/dev/null
 
-# Copy mocha-themed wallpapers
-find catppuccin-walls -name "*.png" -o -name "*.jpg" | head -20 | while read f; do
+if [ ! -d "$TMPDIR/walls" ]; then
+    echo "Failed to clone wallpapers repo"
+    rm -rf "$TMPDIR"
+    exit 1
+fi
+
+# Copy all wallpapers (png, jpg, webp)
+find "$TMPDIR/walls" -maxdepth 2 -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.webp" \) | while read -r f; do
     cp "$f" "$DIR/"
 done
 
-rm -rf catppuccin-walls
-echo "Downloaded $(ls "$DIR" | wc -l) wallpapers to $DIR"
-echo "Wallpaper rotation will use these automatically."
+# Create a symlink for the default wallpaper (first one found)
+DEFAULT=$(ls "$DIR"/*.png 2>/dev/null | head -1)
+[ -n "$DEFAULT" ] && ln -sf "$(basename "$DEFAULT")" "$DIR/cat-mocha-default.png"
+
+rm -rf "$TMPDIR"
+COUNT=$(ls "$DIR" | wc -l)
+echo "Downloaded $COUNT wallpapers to $DIR"
+echo "Default: $(readlink "$DIR/cat-mocha-default.png" 2>/dev/null || echo 'none')"
+echo "Wallpaper rotation and hyprpaper will use these automatically."
