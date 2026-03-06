@@ -614,17 +614,21 @@
 (use-package nerd-icons
   :ensure nil)
 
-;; Dashboard
+;; Dashboard with custom ASCII banner
 (use-package dashboard
   :ensure nil
   :config
-  (setq dashboard-startup-banner 'logo
+  (setq dashboard-banner-logo-title "Welcome to Guix Emacs"
+        dashboard-startup-banner (expand-file-name "~/.config/emacs/banner.txt")
         dashboard-center-content t
+        dashboard-vertically-center-content t
         dashboard-items '((recents . 10)
                           (projects . 5)
                           (agenda . 5))
         dashboard-set-heading-icons t
-        dashboard-set-file-icons t)
+        dashboard-set-file-icons t
+        dashboard-footer-messages
+        '("SPC . find file | SPC , switch buffer | SPC a a AI chat | SPC G s system.scm"))
   (dashboard-setup-startup-hook))
 
 ;; Zen mode for focused writing

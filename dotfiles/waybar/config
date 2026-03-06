@@ -9,7 +9,7 @@
 
     "modules-left": ["hyprland/workspaces", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["custom/emacs", "custom/ai-status", "mpris", "custom/separator", "custom/gpu", "cpu", "memory", "temperature", "custom/separator2", "custom/asus-profile", "backlight", "pulseaudio", "network", "battery", "tray"],
+    "modules-right": ["custom/emacs", "custom/git", "custom/ai-status", "mpris", "custom/separator", "custom/gpu", "cpu", "memory", "temperature", "custom/separator2", "custom/asus-profile", "backlight", "pulseaudio", "network", "battery", "tray"],
 
     "hyprland/workspaces": {
         "format": "{icon}",
@@ -130,6 +130,15 @@
         "interval": 5,
         "tooltip": false,
         "on-click": "emacsclient -c -a emacs"
+    },
+
+    "custom/git": {
+        "exec": "~/.local/bin/git-waybar-status",
+        "format": "{}",
+        "interval": 10,
+        "return-type": "json",
+        "tooltip": true,
+        "on-click": "emacsclient -c -e '(magit-status)'"
     },
 
     "custom/ai-status": {

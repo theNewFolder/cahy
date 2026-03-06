@@ -1,0 +1,46 @@
+#!/bin/sh
+# guix-menu — Wofi-based quick actions for Guix system management
+# Bound to Super+G in Hyprland
+
+options="󰑓 Reconfigure Home
+󰇚 Pull Channels
+󰃢 Garbage Collect
+󰍉 Search Packages
+ Edit system.scm
+ Edit home.scm
+󰑐 Rollback System
+ Snapshot Now
+ System Generations"
+
+chosen=$(echo "$options" | wofi --dmenu --prompt "Guix" --width 400 --height 350)
+
+case "$chosen" in
+    *"Reconfigure Home"*)
+        foot -a floating -e sh -c 'guix-snapshot "pre-reconfigure" && guix home reconfigure ~/cahy/guix/home.scm --substitute-urls="https://bordeaux.guix.gnu.org https://ci.guix.gnu.org https://substitutes.nonguix.org"; read -p "Press Enter..."'
+        ;;
+    *"Pull Channels"*)
+        foot -a floating -e sh -c 'guix pull --substitute-urls="https://bordeaux.guix.gnu.org https://ci.guix.gnu.org https://substitutes.nonguix.org"; read -p "Press Enter..."'
+        ;;
+    *"Garbage Collect"*)
+        foot -a floating -e sh -c 'guix gc -F 10G; echo ""; df -h /gnu/store; read -p "Press Enter..."'
+        ;;
+    *"Search Packages"*)
+        QUERY=$(wofi --dmenu --prompt "Package name")
+        [ -n "$QUERY" ] && foot -a floating -e sh -c "guix search $QUERY | head -60; read -p 'Press Enter...'"
+        ;;
+    *"Edit system.scm"*)
+        emacsclient -c ~/cahy/guix/system.scm
+        ;;
+    *"Edit home.scm"*)
+        emacsclient -c ~/cahy/guix/home.scm
+        ;;
+    *"Rollback System"*)
+        foot -a floating -e sh -c 'guix home list-generations | tail -10; echo ""; read -p "Generation to switch to: " GEN; [ -n "$GEN" ] && guix home switch-generation "$GEN"; read -p "Press Enter..."'
+        ;;
+    *"Snapshot Now"*)
+        foot -a floating -e sh -c 'guix-snapshot "manual"; read -p "Press Enter..."'
+        ;;
+    *"System Generations"*)
+        foot -a floating -e sh -c 'guix system list-generations | tail -20; read -p "Press Enter..."'
+        ;;
+esac
