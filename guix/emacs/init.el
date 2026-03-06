@@ -888,4 +888,21 @@
   :config
   (setq org-protocol-default-template-key "b"))
 
+;;;; ──────────────────────────────────────────────────────────
+;;;; Literate config — auto-tangle org files
+;;;; ──────────────────────────────────────────────────────────
+
+;; LEARNING: Org-babel can "tangle" (extract) source blocks from org files
+;; into standalone files. This lets you write config as a literate document
+;; with explanations, then auto-generate the .el file on save.
+;; Any .org file in ~/.config/emacs/ will auto-tangle when saved.
+(defun my/org-babel-tangle-config ()
+  "Auto-tangle org files in the emacs config directory."
+  (when (and (buffer-file-name)
+             (string-match-p "emacs/.*\\.org$" (buffer-file-name)))
+    (let ((org-confirm-babel-evaluate nil))
+      (org-babel-tangle))))
+
+(add-hook 'after-save-hook #'my/org-babel-tangle-config)
+
 ;;; init.el ends here
