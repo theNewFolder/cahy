@@ -177,7 +177,7 @@
     ("GDK_BACKEND" . "wayland,x11,*")
     ;; Gemini CLI auth
     ("GOOGLE_GENAI_USE_GCA" . "true")
-    ;; FZF theming (Gruvbox)
+    ;; FZF theming (Catppuccin Mocha)
     ("FZF_DEFAULT_COMMAND" . "fd --type f --hidden --follow --exclude .git")
     ;; GTK dark theme + cursor
     ("GTK_THEME" . "Adwaita:dark")
