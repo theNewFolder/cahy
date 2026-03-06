@@ -176,7 +176,8 @@
     ("GOOGLE_GENAI_USE_GCA" . "true")
     ;; FZF theming (Gruvbox)
     ("FZF_DEFAULT_COMMAND" . "fd --type f --hidden --follow --exclude .git")
-    ("FZF_DEFAULT_OPTS" . "--height 40% --layout=reverse --border --color=bg+:#3c3836,bg:#1d2021,spinner:#ffd040,hl:#ff60d0,fg:#fbf1c7,header:#60c0ff,info:#ffd040,pointer:#ffd040,marker:#ff9030,fg+:#fbf1c7,prompt:#ffd040,hl+:#ff60d0")
+    ;; FZF theming (Catppuccin Mocha)
+    ("FZF_DEFAULT_OPTS" . "--height 40% --layout=reverse --border --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8,fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc,marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8")
     ;; Editor
     ("EDITOR" . "emacsclient -c -a emacs")
     ("VISUAL" . "emacsclient -c -a emacs")
