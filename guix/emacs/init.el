@@ -889,6 +889,33 @@
   (setq org-protocol-default-template-key "b"))
 
 ;;;; ──────────────────────────────────────────────────────────
+;;;; Org auto-commit — save org notes to git automatically
+;;;; ──────────────────────────────────────────────────────────
+
+;; LEARNING: This auto-commits any changes to ~/org/ after saving.
+;; Your org-roam notes, journal, and inbox are always version-controlled.
+;; Push happens on Emacs quit so you don't lose work.
+(defun my/org-auto-commit ()
+  "Auto-commit org files after save."
+  (when (and (buffer-file-name)
+             (string-prefix-p (expand-file-name "~/org/")
+                              (buffer-file-name)))
+    (let ((default-directory (expand-file-name "~/org/")))
+      (call-process-shell-command
+       "git add -A && git commit -m 'auto-save' --no-gpg-sign" nil 0))))
+
+(add-hook 'after-save-hook #'my/org-auto-commit)
+
+;; Push org notes on Emacs quit
+(defun my/org-push-on-quit ()
+  "Push org repo when Emacs exits."
+  (let ((default-directory (expand-file-name "~/org/")))
+    (when (file-directory-p ".git")
+      (call-process-shell-command "git push" nil 0))))
+
+(add-hook 'kill-emacs-hook #'my/org-push-on-quit)
+
+;;;; ──────────────────────────────────────────────────────────
 ;;;; Literate config — auto-tangle org files
 ;;;; ──────────────────────────────────────────────────────────
 
