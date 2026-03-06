@@ -70,6 +70,25 @@ for script in "$DOTFILES/bin/"*; do
     fi
 done
 
+# Claude Code memory and settings
+CLAUDE_DIR="$HOME/cahy/claude"
+CLAUDE_PROJECT_DIR="$HOME/.claude/projects/-home-dev/memory"
+if [ -d "$CLAUDE_DIR" ]; then
+    mkdir -p "$CLAUDE_PROJECT_DIR"
+    echo "Copying Claude Code memory files..."
+    cp -n "$CLAUDE_DIR/MEMORY.md" "$CLAUDE_PROJECT_DIR/MEMORY.md" 2>/dev/null || true
+    if [ -f "$CLAUDE_DIR/settings.local.json" ]; then
+        mkdir -p "$HOME/.claude"
+        # Merge permissions if settings.local.json doesn't exist yet
+        if [ ! -f "$HOME/.claude/settings.local.json" ]; then
+            cp "$CLAUDE_DIR/settings.local.json" "$HOME/.claude/settings.local.json"
+            echo "Installed Claude Code settings.local.json"
+        else
+            echo "Claude settings.local.json already exists, skipping"
+        fi
+    fi
+fi
+
 # Link Desktop Applications
 APP_DIR="$HOME/.local/share/applications"
 mkdir -p "$APP_DIR"

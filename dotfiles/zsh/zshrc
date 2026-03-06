@@ -65,6 +65,9 @@ fi
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --color=bg+:#3c3836,bg:#1d2021,spinner:#ffd040,hl:#ff60d0,fg:#fbf1c7,header:#60c0ff,info:#ffd040,pointer:#ffd040,marker:#ff9030,fg+:#fbf1c7,prompt:#ffd040,hl+:#ff60d0'
 
+# Gemini CLI auth (Google Cloud Auth - browser-based)
+export GOOGLE_GENAI_USE_GCA=true
+
 mkcd() { mkdir -p "$1" && cd "$1"; }
 
 # Key bindings
