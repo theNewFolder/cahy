@@ -1,7 +1,16 @@
+/* ── Catppuccin Mocha Waybar Theme ── */
+/* Palette: Base=#1e1e2e, Surface=#313244, Overlay=#585b70
+   Text=#cdd6f4, Subtext=#a6adc8, Lavender=#b4befe
+   Blue=#89b4fa, Sapphire=#74c7ec, Sky=#89dceb
+   Teal=#94e2d5, Green=#a6e3a1, Yellow=#f9e2af
+   Peach=#fab387, Maroon=#eba0ac, Red=#f38ba8
+   Mauve=#cba6f7, Pink=#f5c2e7, Flamingo=#f2cdcd
+   Rosewater=#f5e0dc */
+
 /* ── Reset ── */
 * {
     font-family: "DankMono Nerd Font", "Symbols Nerd Font", "Font Awesome 6 Free";
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 500;
     border: none;
     border-radius: 0;
@@ -13,7 +22,7 @@
 /* ── Bar ── */
 window#waybar {
     background: transparent;
-    color: #ebdbb2;
+    color: #cdd6f4;
 }
 
 /* ── Shared Module Style ── */
@@ -24,7 +33,10 @@ window#waybar {
 #memory,
 #temperature,
 #custom-gpu,
+#custom-emacs,
+#custom-git,
 #custom-ai-status,
+#custom-guix-health,
 #custom-asus-profile,
 #mpris,
 #backlight,
@@ -34,10 +46,10 @@ window#waybar {
 #tray {
     padding: 4px 14px;
     margin: 3px 2px;
-    background: alpha(#282828, 0.85);
-    color: #ebdbb2;
+    background: alpha(#1e1e2e, 0.85);
+    color: #cdd6f4;
     border-radius: 10px;
-    border: 1.5px solid alpha(#504945, 0.6);
+    border: 1.5px solid alpha(#585b70, 0.5);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -49,7 +61,10 @@ window#waybar {
 #memory:hover,
 #temperature:hover,
 #custom-gpu:hover,
+#custom-emacs:hover,
+#custom-git:hover,
 #custom-ai-status:hover,
+#custom-guix-health:hover,
 #custom-asus-profile:hover,
 #mpris:hover,
 #backlight:hover,
@@ -57,15 +72,15 @@ window#waybar {
 #network:hover,
 #pulseaudio:hover,
 #tray:hover {
-    background: alpha(#3c3836, 0.95);
-    border-color: alpha(#ffd040, 0.6);
-    box-shadow: 0 0 12px alpha(#ffd040, 0.15);
+    background: alpha(#313244, 0.95);
+    border-color: alpha(#89b4fa, 0.6);
+    box-shadow: 0 0 12px alpha(#89b4fa, 0.15);
 }
 
 /* ── Separators ── */
 #custom-separator,
 #custom-separator2 {
-    color: alpha(#665c54, 0.5);
+    color: alpha(#585b70, 0.5);
     padding: 0 2px;
     margin: 0;
     background: transparent;
@@ -79,7 +94,7 @@ window#waybar {
 
 #workspaces button {
     padding: 2px 10px;
-    color: #665c54;
+    color: #585b70;
     border: none;
     border-radius: 8px;
     background: transparent;
@@ -88,168 +103,202 @@ window#waybar {
 }
 
 #workspaces button:hover {
-    color: #ebdbb2;
-    background: alpha(#504945, 0.5);
+    color: #cdd6f4;
+    background: alpha(#585b70, 0.3);
 }
 
 #workspaces button.active {
-    background: linear-gradient(135deg, #ffd040 0%, #fabd2f 100%);
-    color: #1d2021;
+    background: linear-gradient(135deg, #89b4fa 0%, #b4befe 100%);
+    color: #1e1e2e;
     font-weight: bold;
-    box-shadow: 0 0 12px alpha(#ffd040, 0.5);
+    box-shadow: 0 0 12px alpha(#89b4fa, 0.5);
     border-radius: 8px;
     animation: glow-workspace 2s ease-in-out infinite;
 }
 
 #workspaces button.urgent {
-    background: linear-gradient(135deg, #fb4934 0%, #cc241d 100%);
-    color: #1d2021;
+    background: linear-gradient(135deg, #f38ba8 0%, #eba0ac 100%);
+    color: #1e1e2e;
     animation: pulse 1.5s ease-in-out infinite;
 }
 
 /* ── Window Title ── */
 #window {
-    color: #83a598;
+    color: #74c7ec;
     font-style: italic;
-    background: alpha(#282828, 0.6);
-    border-color: alpha(#504945, 0.3);
+    background: alpha(#1e1e2e, 0.6);
+    border-color: alpha(#585b70, 0.3);
 }
 
 /* ── Clock ── */
 #clock {
-    background: linear-gradient(135deg, alpha(#458588, 0.9) 0%, alpha(#689d6a, 0.9) 50%, alpha(#83a598, 0.9) 100%);
-    color: #1d2021;
+    background: linear-gradient(135deg, alpha(#cba6f7, 0.9) 0%, alpha(#f5c2e7, 0.9) 100%);
+    color: #1e1e2e;
     font-weight: bold;
     font-size: 14px;
     padding: 4px 18px;
-    border-color: alpha(#83a598, 0.6);
-    box-shadow: 0 0 10px alpha(#83a598, 0.2);
+    border-color: alpha(#cba6f7, 0.6);
+    box-shadow: 0 0 10px alpha(#cba6f7, 0.2);
     animation: clock-glow 4s ease-in-out infinite;
 }
 
 #clock:hover {
-    box-shadow: 0 0 20px alpha(#83a598, 0.5);
-    border-color: alpha(#8ec07c, 0.8);
+    box-shadow: 0 0 20px alpha(#cba6f7, 0.5);
+    border-color: alpha(#f5c2e7, 0.8);
+}
+
+/* ── Emacs Status ── */
+#custom-emacs {
+    color: #cba6f7;
+    border-bottom: 2px solid alpha(#cba6f7, 0.4);
+}
+
+/* ── Git Status ── */
+#custom-git {
+    color: #fab387;
+    border-bottom: 2px solid alpha(#fab387, 0.4);
+}
+
+#custom-git.dirty {
+    color: #f9e2af;
+    border-bottom-color: alpha(#f9e2af, 0.6);
+}
+
+#custom-git.clean {
+    color: #a6e3a1;
+    border-bottom-color: alpha(#a6e3a1, 0.4);
 }
 
 /* ── System Monitors ── */
 #cpu {
-    color: #fe8019;
-    border-bottom: 2px solid alpha(#fe8019, 0.4);
+    color: #fab387;
+    border-bottom: 2px solid alpha(#fab387, 0.4);
 }
 
 #memory {
-    color: #d3869b;
-    border-bottom: 2px solid alpha(#d3869b, 0.4);
+    color: #f5c2e7;
+    border-bottom: 2px solid alpha(#f5c2e7, 0.4);
 }
 
 #temperature {
-    color: #8ec07c;
-    border-bottom: 2px solid alpha(#8ec07c, 0.4);
+    color: #a6e3a1;
+    border-bottom: 2px solid alpha(#a6e3a1, 0.4);
 }
 
 #temperature.critical {
-    background: linear-gradient(135deg, #fb4934 0%, #cc241d 100%);
-    color: #1d2021;
+    background: linear-gradient(135deg, #f38ba8 0%, #eba0ac 100%);
+    color: #1e1e2e;
     animation: pulse 1s ease-in-out infinite;
 }
 
 #custom-gpu {
-    color: #b8bb26;
-    border-bottom: 2px solid alpha(#b8bb26, 0.4);
+    color: #94e2d5;
+    border-bottom: 2px solid alpha(#94e2d5, 0.4);
 }
 
 /* ── AI Status ── */
 #custom-ai-status {
-    color: #d3869b;
-    border-bottom: 2px solid alpha(#d3869b, 0.4);
+    color: #f5c2e7;
+    border-bottom: 2px solid alpha(#f5c2e7, 0.4);
 }
 
 #custom-ai-status.active {
-    color: #b8bb26;
-    border-bottom-color: alpha(#b8bb26, 0.6);
+    color: #a6e3a1;
+    border-bottom-color: alpha(#a6e3a1, 0.6);
     animation: pulse 2s ease-in-out infinite;
+}
+
+/* ── Guix Health ── */
+#custom-guix-health {
+    color: #89b4fa;
+    border-bottom: 2px solid alpha(#89b4fa, 0.4);
+}
+
+#custom-guix-health.warning {
+    color: #f9e2af;
+    border-bottom-color: alpha(#f9e2af, 0.6);
+    animation: pulse 3s ease-in-out infinite;
 }
 
 /* ── ASUS Profile ── */
 #custom-asus-profile {
-    color: #83a598;
+    color: #74c7ec;
     font-size: 13px;
 }
 
 #custom-asus-profile.performance {
-    color: #fb4934;
-    border-bottom: 2px solid alpha(#fb4934, 0.4);
+    color: #f38ba8;
+    border-bottom: 2px solid alpha(#f38ba8, 0.4);
 }
 
 #custom-asus-profile.balanced {
-    color: #fabd2f;
-    border-bottom: 2px solid alpha(#fabd2f, 0.4);
+    color: #f9e2af;
+    border-bottom: 2px solid alpha(#f9e2af, 0.4);
 }
 
 #custom-asus-profile.quiet {
-    color: #8ec07c;
-    border-bottom: 2px solid alpha(#8ec07c, 0.4);
+    color: #a6e3a1;
+    border-bottom: 2px solid alpha(#a6e3a1, 0.4);
 }
 
 /* ── Media ── */
 #mpris {
-    color: #8ec07c;
+    color: #a6e3a1;
     font-style: italic;
-    background: alpha(#282828, 0.7);
-    border-color: alpha(#8ec07c, 0.3);
+    background: alpha(#1e1e2e, 0.7);
+    border-color: alpha(#a6e3a1, 0.3);
 }
 
 #mpris:hover {
-    border-color: alpha(#8ec07c, 0.6);
-    box-shadow: 0 0 12px alpha(#8ec07c, 0.15);
+    border-color: alpha(#a6e3a1, 0.6);
+    box-shadow: 0 0 12px alpha(#a6e3a1, 0.15);
 }
 
 /* ── Controls ── */
 #backlight {
-    color: #fabd2f;
+    color: #f9e2af;
 }
 
 #pulseaudio {
-    color: #d3869b;
+    color: #f5c2e7;
 }
 
 #pulseaudio.muted {
-    color: #665c54;
-    background: alpha(#282828, 0.6);
+    color: #585b70;
+    background: alpha(#1e1e2e, 0.6);
 }
 
 /* ── Network ── */
 #network {
-    color: #83a598;
+    color: #74c7ec;
 }
 
 #network.disconnected {
-    color: #fb4934;
-    background: alpha(#3c1919, 0.8);
-    border-color: alpha(#fb4934, 0.4);
+    color: #f38ba8;
+    background: alpha(#302030, 0.8);
+    border-color: alpha(#f38ba8, 0.4);
 }
 
 /* ── Battery ── */
 #battery {
-    color: #fabd2f;
+    color: #f9e2af;
 }
 
 #battery.charging {
-    color: #1d2021;
-    background: linear-gradient(135deg, alpha(#b8bb26, 0.9) 0%, alpha(#98971a, 0.9) 100%);
-    border-color: alpha(#b8bb26, 0.6);
+    color: #1e1e2e;
+    background: linear-gradient(135deg, alpha(#a6e3a1, 0.9) 0%, alpha(#94e2d5, 0.9) 100%);
+    border-color: alpha(#a6e3a1, 0.6);
 }
 
 #battery.warning:not(.charging) {
-    color: #1d2021;
-    background: linear-gradient(135deg, #fe8019 0%, #d65d0e 100%);
+    color: #1e1e2e;
+    background: linear-gradient(135deg, #fab387 0%, #f9e2af 100%);
     animation: pulse 2s ease-in-out infinite;
 }
 
 #battery.critical:not(.charging) {
-    color: #1d2021;
-    background: linear-gradient(135deg, #fb4934 0%, #cc241d 100%);
+    color: #1e1e2e;
+    background: linear-gradient(135deg, #f38ba8 0%, #eba0ac 100%);
     animation: pulse 1s ease-in-out infinite;
 }
 
@@ -263,7 +312,7 @@ window#waybar {
 }
 
 #tray > .needs-attention {
-    background: alpha(#fb4934, 0.8);
+    background: alpha(#f38ba8, 0.8);
     animation: pulse 1s ease-in-out infinite;
 }
 
@@ -275,27 +324,27 @@ window#waybar {
 }
 
 @keyframes glow-workspace {
-    0%   { box-shadow: 0 0 8px alpha(#ffd040, 0.3); }
-    50%  { box-shadow: 0 0 16px alpha(#ffd040, 0.6); }
-    100% { box-shadow: 0 0 8px alpha(#ffd040, 0.3); }
+    0%   { box-shadow: 0 0 8px alpha(#89b4fa, 0.3); }
+    50%  { box-shadow: 0 0 16px alpha(#89b4fa, 0.6); }
+    100% { box-shadow: 0 0 8px alpha(#89b4fa, 0.3); }
 }
 
 @keyframes clock-glow {
-    0%   { box-shadow: 0 0 8px alpha(#83a598, 0.15); }
-    50%  { box-shadow: 0 0 14px alpha(#83a598, 0.35); }
-    100% { box-shadow: 0 0 8px alpha(#83a598, 0.15); }
+    0%   { box-shadow: 0 0 8px alpha(#cba6f7, 0.15); }
+    50%  { box-shadow: 0 0 14px alpha(#cba6f7, 0.35); }
+    100% { box-shadow: 0 0 8px alpha(#cba6f7, 0.15); }
 }
 
 /* ── Tooltip ── */
 tooltip {
-    background: alpha(#1d2021, 0.95);
-    border: 1.5px solid alpha(#fabd2f, 0.5);
+    background: alpha(#1e1e2e, 0.95);
+    border: 1.5px solid alpha(#89b4fa, 0.5);
     border-radius: 10px;
     padding: 8px 12px;
 }
 
 tooltip label {
-    color: #ebdbb2;
+    color: #cdd6f4;
     font-family: "DankMono Nerd Font";
-    font-size: 14px;
+    font-size: 13px;
 }
