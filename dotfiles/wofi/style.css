@@ -1,0 +1,60 @@
+/* Catppuccin Mocha wofi theme */
+window {
+    margin: 0px;
+    background-color: #1e1e2e;
+    border: 2px solid #89b4fa;
+    border-radius: 12px;
+    font-family: "DankMono Nerd Font";
+    font-size: 14px;
+}
+
+#input {
+    margin: 8px;
+    padding: 8px 12px;
+    background-color: #313244;
+    color: #cdd6f4;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+#input:focus {
+    border: 1px solid #89b4fa;
+}
+
+#inner-box {
+    margin: 4px 8px;
+}
+
+#outer-box {
+    margin: 0px;
+    padding: 0px;
+}
+
+#scroll {
+    margin: 0px;
+}
+
+#text {
+    margin: 2px;
+    padding: 4px 8px;
+    color: #cdd6f4;
+}
+
+#text:selected {
+    color: #1e1e2e;
+}
+
+#entry {
+    padding: 4px;
+    border-radius: 8px;
+}
+
+#entry:selected {
+    background-color: #89b4fa;
+    color: #1e1e2e;
+}
+
+#entry:hover {
+    background-color: #313244;
+}

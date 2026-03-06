@@ -176,6 +176,8 @@
     ("GOOGLE_GENAI_USE_GCA" . "true")
     ;; FZF theming (Gruvbox)
     ("FZF_DEFAULT_COMMAND" . "fd --type f --hidden --follow --exclude .git")
+    ;; GTK dark theme preference
+    ("GTK_THEME" . "Adwaita:dark")
     ;; FZF theming (Catppuccin Mocha)
     ("FZF_DEFAULT_OPTS" . "--height 40% --layout=reverse --border --color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8,fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc,marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8")
     ;; Editor
@@ -225,6 +227,7 @@ fpath+=($HOME/.guix-home/profile/share/zsh/site-functions)
    `("mako"          ,(dotfile-dir "mako"))
    `("foot"          ,(dotfile-dir "foot"))
    `("kitty"         ,(dotfile-dir "kitty"))
+   `("wofi"          ,(dotfile-dir "wofi"))
    `("starship.toml" ,(dotfile "starship.toml"))
    `("mimeapps.list" ,(dotfile "mimeapps.list"))
    ;; Guix-native Emacs config (replaces Doom)
