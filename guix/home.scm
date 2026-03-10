@@ -127,7 +127,7 @@
     ;; ── Wayland tools ──
     "wofi" "wl-clipboard" "grim" "slurp" "swappy"
     "wlsunset" "brightnessctl" "playerctl"
-    "mako"
+    "mako" "wdisplays"                     ;display configuration GUI
     ;; File manager
     "yazi"                              ;terminal file manager (Super+T)
 
