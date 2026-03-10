@@ -1,0 +1,123 @@
+#+title: Org-Mode Essentials for Daily Use
+#+filetags: :learning:emacs:org:
+#+startup: overview
+
+Quick reference for Org-mode in Evil mode with SPC leader.
+
+* Getting Started
+** Open Org files
+- =SPC o a= — Org Agenda (daily view)
+- =SPC o c= — Org Capture (quick entry)
+- =SPC o r= — Org Roam (find note)
+- =SPC o d= — Today's daily note
+
+** Basic Structure
+#+begin_src org
+,* Heading 1
+,** Heading 2
+,*** Heading 3
+- bullet list
+  - nested
+1. numbered
+2. list
+#+end_src
+
+Press =TAB= on a heading to fold/unfold.
+Press =S-TAB= to cycle all headings.
+
+* Tasks & TODOs
+** Create a TODO
+Type =* TODO my task= or use capture: =SPC o c t=
+
+** Cycle states
+On a heading: =t= in normal mode or =S-LEFT/RIGHT=
+: TODO → DONE
+
+** Schedule & Deadlines
+- =SPC m d= — Set deadline
+- =SPC m s= — Set schedule
+- =C-c .= — Insert timestamp
+
+** Priorities
+On a heading: =S-UP/DOWN= to cycle =[#A]= → =[#B]= → =[#C]=
+
+* Org Roam (Zettelkasten)
+** The Idea
+Every note is a *node* in a graph. Link notes to build knowledge.
+Don't organize by folders — use tags and links instead.
+
+** Create a note
+=SPC o r= → type title → select template:
+- =d= default — general note
+- =r= reference — for sources/articles
+- =p= project — project notes with goals/tasks
+- =m= meeting — attendees, agenda, action items
+- =b= book — summary, key ideas, quotes
+
+** Link notes
+In any org file: =SPC o l= to insert a link to another roam node.
+Backlinks show automatically in the roam buffer.
+
+** Visualize
+=M-x org-roam-ui-mode= opens a web graph of all your notes.
+
+* Code Blocks
+** Evaluate Scheme in Org
+#+begin_src scheme
+(+ 1 2 3)
+#+end_src
+
+Press =C-c C-c= on the block to evaluate.
+Results appear below as =#+RESULTS:=.
+
+** Supported languages
+Guile Scheme, Python, Shell, Emacs Lisp — all evaluate inline.
+
+** Tangle (literate config)
+Add =:tangle filename.el= to a source block header.
+=C-c C-v t= or save to auto-tangle (configured in init.el).
+
+* Tables
+** Create
+Type =|col1|col2|col3= then =TAB= to auto-format.
+
+** Example
+| Task        | Priority | Status |
+|-------------+----------+--------|
+| Learn Guile | A        | WIP    |
+| Setup mu4e  | B        | TODO   |
+| Rice Waybar | C        | DONE   |
+
+=TAB= moves between cells, =RET= creates new rows.
+=C-c -= adds a horizontal rule.
+
+* Journal / Daily Notes
+- =SPC o d= — Go to today's note (org-roam-dailies)
+- =SPC o j= — Journal entry (org-capture j)
+- Auto-committed to git on save (configured in init.el)
+
+* Export
+- =C-c C-e= — Export dispatcher
+  - =h h= — HTML
+  - =l l= — LaTeX/PDF
+  - =m m= — Markdown
+  - =t t= — Plain text
+
+* Cheat Sheet
+| Key         | Action              |
+|-------------+---------------------|
+| TAB         | Fold/unfold heading |
+| S-TAB       | Cycle all           |
+| t           | Toggle TODO state   |
+| SPC o a     | Agenda              |
+| SPC o c     | Capture             |
+| SPC o r     | Roam find           |
+| SPC o d     | Today's note        |
+| C-c C-c     | Eval code block     |
+| C-c C-e     | Export              |
+| C-c .       | Insert date         |
+| C-c C-l     | Insert link         |
+| C-c C-t     | Toggle TODO         |
+| M-RET       | New heading         |
+| M-UP/DOWN   | Move heading        |
+| M-LEFT/RIGHT| Promote/demote      |

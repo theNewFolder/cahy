@@ -242,9 +242,11 @@ fpath+=($HOME/.guix-home/profile/share/zsh/site-functions)
      ,(local-file (string-append %cahy-dir "/guix/emacs/init.el")))
    `("emacs/banner.txt"
      ,(local-file (string-append %cahy-dir "/guix/emacs/banner.txt")))
-   ;; Guile learning exercises
+   ;; Learning guides
    `("emacs/guile-exercises.org"
      ,(local-file (string-append %cahy-dir "/guix/learning/guile-exercises.org")))
+   `("emacs/org-mode-guide.org"
+     ,(local-file (string-append %cahy-dir "/guix/learning/org-mode-guide.org")))
    `("guix/channels.scm"
      ,(local-file (string-append (getenv "HOME")
                                  "/.config/guix/channels.scm")))))

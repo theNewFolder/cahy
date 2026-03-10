@@ -243,14 +243,21 @@
     "c f" '(eglot-format :which-key "format")
     "c e" '(consult-flymake :which-key "errors"))
 
-  ;; Help
+  ;; Help + Learning
   (my/leader
-    "h"   '(:ignore t :which-key "help")
+    "h"   '(:ignore t :which-key "help/learn")
     "h f" '(describe-function :which-key "function")
     "h v" '(describe-variable :which-key "variable")
     "h k" '(describe-key :which-key "key")
     "h m" '(describe-mode :which-key "mode")
-    "h i" '(info :which-key "info"))
+    "h i" '(info :which-key "info")
+    ;; Learning resources
+    "h g" '((lambda () (interactive) (info "guix")) :which-key "Guix manual")
+    "h r" '((lambda () (interactive) (info "guile")) :which-key "Guile reference")
+    "h e" '((lambda () (interactive) (info "emacs")) :which-key "Emacs manual")
+    "h o" '((lambda () (interactive) (find-file "~/.config/emacs/org-mode-guide.org")) :which-key "Org guide")
+    "h s" '((lambda () (interactive) (find-file "~/.config/emacs/guile-exercises.org")) :which-key "Scheme exercises")
+    "h t" '((lambda () (interactive) (info "(guile)API Reference")) :which-key "Guile API"))
 
   ;; Toggle
   (my/leader
