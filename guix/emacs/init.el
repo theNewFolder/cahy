@@ -448,7 +448,38 @@
   :ensure nil
   :hook (org-mode . org-modern-mode)
   :config
-  (setq org-modern-star '("◉" "○" "◈" "◇" "▸")))
+  (setq org-modern-star '("◉" "○" "◈" "◇" "▸")
+        ;; Table styling
+        org-modern-table t
+        org-modern-table-vertical 2
+        org-modern-table-horizontal 0.1
+        ;; Other org-modern niceties
+        org-modern-list '((?- . "•") (?+ . "◦") (?* . "‣"))
+        org-modern-checkbox '((?X . "☑") (?- . "◫") (?\s . "☐"))
+        org-modern-priority '((?A . "🅐") (?B . "🅑") (?C . "🅒"))
+        org-modern-block-fringe t))
+
+;; Variable-pitch headings with scaled sizes
+(with-eval-after-load 'org
+  (custom-set-faces
+   '(org-level-1 ((t (:inherit variable-pitch :height 1.4 :weight bold))))
+   '(org-level-2 ((t (:inherit variable-pitch :height 1.25 :weight bold))))
+   '(org-level-3 ((t (:inherit variable-pitch :height 1.15 :weight semi-bold))))
+   '(org-level-4 ((t (:inherit variable-pitch :height 1.1 :weight semi-bold))))
+   '(org-level-5 ((t (:inherit variable-pitch :height 1.05))))
+   '(org-document-title ((t (:inherit variable-pitch :height 1.6 :weight bold))))))
+
+;; visual-fill-column for org — centered, 100 char width
+(use-package visual-fill-column
+  :ensure nil
+  :hook (org-mode . my/org-visual-setup)
+  :config
+  (defun my/org-visual-setup ()
+    "Enable visual-line-mode and visual-fill-column for Org."
+    (setq visual-fill-column-width 100
+          visual-fill-column-center-text t)
+    (visual-line-mode 1)
+    (visual-fill-column-mode 1)))
 
 (use-package org-appear
   :ensure nil
@@ -531,10 +562,23 @@
   :ensure nil
   :hook (prog-mode . flycheck-mode))
 
-;; Highlight TODOs in code
+;; Highlight TODOs in code — Catppuccin Mocha colors
 (use-package hl-todo
   :ensure nil
-  :hook (prog-mode . hl-todo-mode))
+  :hook (prog-mode . hl-todo-mode)
+  :config
+  (setq hl-todo-keyword-faces
+        '(("TODO"    . "#f9e2af")   ; yellow
+          ("FIXME"   . "#f38ba8")   ; red
+          ("HACK"    . "#fab387")   ; peach
+          ("NOTE"    . "#a6e3a1")   ; green
+          ("BUG"     . "#f38ba8")   ; red
+          ("XXX"     . "#cba6f7")   ; mauve
+          ("REVIEW"  . "#89b4fa")   ; blue
+          ("DEPRECATED" . "#6c7086") ; overlay0 (muted)
+          ("WARNING" . "#fab387")   ; peach
+          ("TEMP"    . "#94e2d5")   ; teal
+          ("OPTIMIZE" . "#74c7ec"))))
 
 (use-package eglot
   :ensure nil
@@ -564,12 +608,49 @@
 ;; LEARNING: geiser provides a Scheme REPL in Emacs. geiser-guile
 ;; connects to Guile specifically. Essential for Guix development.
 (use-package geiser
-  :ensure nil)
-(use-package geiser-guile
   :ensure nil
   :config
-  (setq geiser-guile-binary "guile"
-        geiser-default-implementation 'guile))
+  (setq geiser-default-implementation 'guile
+        geiser-active-implementations '(guile)
+        geiser-mode-auto-p t              ; auto-connect to REPL
+        geiser-repl-query-on-kill-p nil)) ; don't ask when killing REPL
+
+(use-package geiser-guile
+  :ensure nil
+  :after geiser
+  :config
+  (setq geiser-guile-binary (or (executable-find "guile")
+                                (expand-file-name "~/.guix-profile/bin/guile")
+                                "guile")
+        geiser-guile-load-path '("~/.guix-profile/share/guile/site/3.0"))
+
+  ;; Auto-start Geiser REPL when opening .scm files
+  (defun my/geiser-auto-connect ()
+    "Start Geiser REPL if not already running when opening a Scheme file."
+    (unless (geiser-repl--connection*)
+      (save-window-excursion
+        (run-geiser 'guile))))
+  (add-hook 'scheme-mode-hook #'my/geiser-auto-connect))
+
+;; LEARNING: smartparens provides structural editing for Lisp code.
+;; Strict mode prevents you from deleting unmatched parens — keeps code valid.
+;; Slurp (>) pulls the next sexp into current list.
+;; Barf (<) pushes the last sexp out of current list.
+(use-package smartparens
+  :ensure nil
+  :hook ((scheme-mode . smartparens-strict-mode)
+         (emacs-lisp-mode . smartparens-strict-mode)
+         (geiser-repl-mode . smartparens-strict-mode))
+  :config
+  (require 'smartparens-config)  ; default pairs and config
+
+  ;; Evil-compatible slurp/barf in normal mode for Lisp modes
+  (with-eval-after-load 'evil
+    (evil-define-key 'normal smartparens-mode-map
+      (kbd ">)") 'sp-forward-slurp-sexp    ; pull next sexp in
+      (kbd "<)") 'sp-forward-barf-sexp     ; push last sexp out
+      (kbd "<(") 'sp-backward-slurp-sexp   ; pull prev sexp in
+      (kbd ">(") 'sp-backward-barf-sexp))) ; push first sexp out
 
 ;; Rust
 (use-package rust-mode
@@ -624,7 +705,21 @@
   (setq doom-modeline-height 30
         doom-modeline-bar-width 4
         doom-modeline-icon t
-        doom-modeline-buffer-encoding nil))
+        doom-modeline-buffer-encoding nil
+        doom-modeline-workspace-name t       ; show workspace number
+        doom-modeline-modal t                ; show Evil state indicator
+        doom-modeline-modal-icon t           ; icon for Evil states
+        doom-modeline-modal-modern-icon t))  ; modern colored Evil indicators
+
+;; Evil state colors — Catppuccin Mocha palette
+(with-eval-after-load 'doom-modeline
+  (set-face-attribute 'doom-modeline-evil-normal-state nil :foreground "#a6e3a1")   ; green
+  (set-face-attribute 'doom-modeline-evil-insert-state nil :foreground "#89b4fa")   ; blue
+  (set-face-attribute 'doom-modeline-evil-visual-state nil :foreground "#cba6f7")   ; mauve
+  (set-face-attribute 'doom-modeline-evil-replace-state nil :foreground "#f38ba8")  ; red
+  (set-face-attribute 'doom-modeline-evil-operator-state nil :foreground "#fab387") ; peach
+  (set-face-attribute 'doom-modeline-evil-motion-state nil :foreground "#94e2d5")   ; teal
+  (set-face-attribute 'doom-modeline-evil-emacs-state nil :foreground "#f5c2e7"))   ; pink
 
 ;; Icons
 (use-package nerd-icons
@@ -654,21 +749,58 @@
     '(bar workspace-name window-number modals matches follow buffer-info remote-host buffer-position word-count parrot selection-info)
     '(compilation objed-state misc-info persp-name battery grip irc mu4e gnus github debug repl lsp minor-modes input-method indent-info buffer-encoding major-mode process vcs checker time guix-gen)))
 
-;; Dashboard with custom ASCII banner
+;; Dashboard with custom ASCII banner + navigator + quotes
 (use-package dashboard
   :ensure nil
   :config
-  (setq dashboard-banner-logo-title "Welcome to Guix Emacs"
+  (setq dashboard-banner-logo-title "G U I X  E M A C S"
         dashboard-startup-banner (expand-file-name "~/.config/emacs/banner.txt")
         dashboard-center-content t
         dashboard-vertically-center-content t
-        dashboard-items '((agenda . 5)
-                          (recents . 10)
+        dashboard-items '((recents . 8)
+                          (agenda . 5)
                           (projects . 5))
         dashboard-set-heading-icons t
         dashboard-set-file-icons t
+
+        ;; Navigator buttons at the top
+        dashboard-set-navigator t
+        dashboard-navigator-buttons
+        `(((,(nerd-icons-faicon "nf-fa-folder_open" :height 1.0 :face 'font-lock-keyword-face)
+            " Find File" "Browse files"
+            (lambda (&rest _) (call-interactively #'find-file)))
+           (,(nerd-icons-faicon "nf-fa-clock_o" :height 1.0 :face 'font-lock-type-face)
+            " Recent" "Recent files"
+            (lambda (&rest _) (call-interactively #'consult-recent-file)))
+           (,(nerd-icons-faicon "nf-fa-briefcase" :height 1.0 :face 'font-lock-function-name-face)
+            " Project" "Switch project"
+            (lambda (&rest _) (call-interactively #'project-switch-project)))
+           (,(nerd-icons-faicon "nf-fa-calendar" :height 1.0 :face 'font-lock-constant-face)
+            " Agenda" "Org agenda"
+            (lambda (&rest _) (org-agenda nil "a")))
+           (,(nerd-icons-faicon "nf-fa-cog" :height 1.0 :face 'font-lock-comment-face)
+            " Settings" "Edit init.el"
+            (lambda (&rest _) (find-file user-init-file)))))
+
+        ;; Random footer quotes about Emacs/Guile/hacking
+        dashboard-footer-icon
+        (nerd-icons-faicon "nf-fa-quote_left" :height 1.0 :face 'font-lock-doc-face)
         dashboard-footer-messages
-        '("SPC . find file | SPC , switch buffer | SPC a a AI chat | SPC G s system.scm"))
+        '("Emacs is not an editor; it is a Lisp interpreter that happens to edit text."
+          "The best way to predict the future is to invent it. -- Alan Kay"
+          "Guile is the GNU extension language -- learn it, love it, hack it."
+          "The computer is the bicycle of the mind. -- Steve Jobs"
+          "Any sufficiently advanced technology is indistinguishable from magic. -- Arthur C. Clarke"
+          "Programs must be written for people to read. -- Abelson & Sussman"
+          "Simplicity is prerequisite for reliability. -- Dijkstra"
+          "First, solve the problem. Then, write the code. -- John Johnson"
+          "Talk is cheap. Show me the code. -- Linus Torvalds"
+          "A Lisp programmer knows the value of everything and the cost of nothing. -- Alan Perlis"
+          "Guix is the ultimate declarative system -- your OS is just a function."
+          "In Emacs, the journey is the destination. M-x butterfly"
+          "Hack the planet! -- Hackers (1995)"
+          "Free software is a matter of liberty, not price. -- RMS"
+          "Lambda: the ultimate imperative. -- Guy Steele"))
   (dashboard-setup-startup-hook))
 
 ;; Zen mode for focused writing
@@ -681,10 +813,21 @@
   :config
   (direnv-mode 1))
 
-;; Rainbow delimiters for Lisp
+;; Rainbow delimiters for Lisp — Catppuccin Mocha palette
 (use-package rainbow-delimiters
   :ensure nil
-  :hook (prog-mode . rainbow-delimiters-mode))
+  :hook (prog-mode . rainbow-delimiters-mode)
+  :config
+  (with-eval-after-load 'rainbow-delimiters
+    (set-face-foreground 'rainbow-delimiters-depth-1-face "#f38ba8")   ; red
+    (set-face-foreground 'rainbow-delimiters-depth-2-face "#fab387")   ; peach
+    (set-face-foreground 'rainbow-delimiters-depth-3-face "#f9e2af")   ; yellow
+    (set-face-foreground 'rainbow-delimiters-depth-4-face "#a6e3a1")   ; green
+    (set-face-foreground 'rainbow-delimiters-depth-5-face "#89b4fa")   ; blue
+    (set-face-foreground 'rainbow-delimiters-depth-6-face "#cba6f7")   ; mauve
+    (set-face-foreground 'rainbow-delimiters-depth-7-face "#94e2d5")   ; teal
+    (set-face-foreground 'rainbow-delimiters-depth-8-face "#f5c2e7")   ; pink
+    (set-face-foreground 'rainbow-delimiters-depth-9-face "#74c7ec")))
 
 ;;;; ──────────────────────────────────────────────────────────
 ;;;; File management — Dirvish (enhanced dired)
@@ -809,13 +952,8 @@
 ;;;; Auto-open daily note on startup
 ;;;; ──────────────────────────────────────────────────────────
 
-;; LEARNING: This opens today's org-roam daily note when Emacs starts.
-;; Great for building a daily journaling habit.
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (when (and (not (daemonp))
-                       (file-directory-p "~/org/roam"))
-              (org-roam-dailies-goto-today))))
+;; LEARNING: Dashboard shows on startup. Use SPC o d to open today's daily note.
+;; Removed auto-open of daily note to avoid conflicting with dashboard.
 
 ;;;; ──────────────────────────────────────────────────────────
 ;;;; Email — mu4e + Gmail
@@ -898,6 +1036,9 @@
 ;; Built into Emacs, works with geiser for Scheme.
 (add-hook 'scheme-mode-hook #'eldoc-mode)
 
+;; Disable electric-pair in Scheme buffers (smartparens-strict handles pairing)
+(add-hook 'scheme-mode-hook (lambda () (electric-pair-local-mode -1)))
+
 ;; Auto-indent Scheme on save
 ;; LEARNING: This ensures consistent formatting in .scm files.
 (defun my/scheme-format-on-save ()
@@ -918,7 +1059,11 @@
    "r" '(geiser-eval-region :which-key "eval region")
    "d" '(geiser-doc-symbol-at-point :which-key "docs")
    "s" '(geiser :which-key "REPL")
-   "c" '(geiser-connect :which-key "connect")))
+   "c" '(geiser-connect :which-key "connect")
+   "l" '(geiser-load-file :which-key "load file")
+   "k" '(geiser-compile-file :which-key "compile file")
+   "i" '(geiser-insert-lambda :which-key "insert lambda")
+   "m" '(geiser-expand-last-sexp :which-key "macro expand")))
 
 ;; LEARNING: org-protocol lets you capture URLs from Firefox.
 ;; Install the org-protocol Firefox extension, then clicking the

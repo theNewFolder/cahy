@@ -27,7 +27,17 @@
   (kernel-arguments
    (append '("modprobe.blacklist=nouveau"
              "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
-             "nvidia.NVreg_DynamicPowerManagement=0x02")
+             "nvidia.NVreg_DynamicPowerManagement=0x02"
+             ;; RTD3 power management for NVIDIA laptop (battery savings)
+             "nvidia.NVreg_EnableS0ixPowerManagement=1"
+             ;; NVMe: disable scheduler (NVMe has its own HW queues)
+             "elevator=none"
+             ;; Faster boot
+             "quiet" "loglevel=3"
+             ;; Memory: THP on-demand for better huge page handling
+             "transparent_hugepage=madvise"
+             ;; NVMe: disable power-state latency limit for max performance
+             "nvme_core.default_ps_max_latency_us=0")
            %default-kernel-arguments))
 
   ;; ── Locale ──
@@ -122,6 +132,19 @@
                (cpu-boost-on-ac? #t)
                (cpu-boost-on-bat? #f)))
 
+     ;; Sysctl tuning — low swappiness (16GB RAM), aggressive VFS caching
+     (simple-service 'sysctl-tuning
+                     shepherd-root-service-type
+                     (list (shepherd-service
+                            (provision '(sysctl-tuning))
+                            (requirement '(file-systems))
+                            (one-shot? #t)
+                            (start #~(lambda _
+                                       (invoke "/run/current-system/profile/bin/sysctl" "-w"
+                                               "vm.swappiness=10"
+                                               "vm.vfs_cache_pressure=50")))
+                            (documentation "Apply performance sysctl tunables."))))
+
      ;; Mcron — system maintenance
      (service mcron-service-type
               (mcron-configuration
@@ -143,7 +166,9 @@
                      "https://cache-us-lax.guix.moe"
                      "https://cache-sg.guix.moe"))
                   (extra-options '("--max-jobs=4"
-                                   "--cores=8"))
+                                   "--cores=8"
+                                   "--gc-keep-outputs=yes"
+                                   "--gc-keep-derivations=yes"))
                   (authorized-keys
                    (append
                     (list (plain-file "nonguix.pub"

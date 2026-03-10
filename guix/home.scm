@@ -305,7 +305,9 @@ fpath+=($HOME/.guix-home/profile/share/zsh/site-functions)
                                                 "/.local/state"))
                              "/emacs-daemon.log")))
     (stop #~(make-kill-destructor))
-    (respawn? #t))))
+    (respawn? #t))
+
+))
 
 ;; ────────────────────────────────────────────────────────────
 ;; Mcron — scheduled maintenance
@@ -327,7 +329,13 @@ fpath+=($HOME/.guix-home/profile/share/zsh/site-functions)
    ;; Every 30 minutes: rotate wallpaper
    #~(job '(next-minute-from (next-hour '()) '(0 30))
           (string-append (getenv "HOME") "/.local/bin/wallpaper-rotate")
-          "wallpaper-rotate")))
+          "wallpaper-rotate")
+   ;; Every 5 minutes: sync email (if mbsync configured)
+   #~(job '(next-minute-from (next-hour '()) '(0 5 10 15 20 25 30 35 40 45 50 55))
+          (string-append "test -f " (getenv "HOME") "/.secrets/gmail_app_password && "
+                         #$(specification->package "isync") "/bin/mbsync -a -q && "
+                         #$(specification->package "mu") "/bin/mu index --quiet")
+          "mbsync-periodic")))
 
 ;; ────────────────────────────────────────────────────────────
 ;; SECRETS STRATEGY
