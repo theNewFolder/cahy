@@ -596,7 +596,7 @@
          (js-mode . eglot-ensure)
          (js-ts-mode . eglot-ensure)
          (typescript-ts-mode . eglot-ensure)
-         (scheme-mode . eglot-ensure))
+)  ; scheme-mode uses Geiser instead of eglot
   :config
   (setq eglot-autoshutdown t           ; shutdown LSP when buffer closed
         eglot-events-buffer-size 0))   ; less memory for logs
@@ -1070,7 +1070,8 @@
    "l" '(geiser-load-file :which-key "load file")
    "k" '(geiser-compile-file :which-key "compile file")
    "i" '(geiser-insert-lambda :which-key "insert lambda")
-   "m" '(geiser-expand-last-sexp :which-key "macro expand")))
+   "m" '(geiser-expand-last-sexp :which-key "macro expand")
+   "t" '(geiser-eval-last-sexp :which-key "eval sexp at point")))
 
 ;; LEARNING: org-protocol lets you capture URLs from Firefox.
 ;; Install the org-protocol Firefox extension, then clicking the
