@@ -1,15 +1,17 @@
 /* ── Catppuccin Mocha Waybar Theme ── */
-/* Palette: Base=#1e1e2e, Surface=#313244, Overlay=#585b70
-   Text=#cdd6f4, Subtext=#a6adc8, Lavender=#b4befe
-   Blue=#89b4fa, Sapphire=#74c7ec, Sky=#89dceb
-   Teal=#94e2d5, Green=#a6e3a1, Yellow=#f9e2af
-   Peach=#fab387, Maroon=#eba0ac, Red=#f38ba8
-   Mauve=#cba6f7, Pink=#f5c2e7, Flamingo=#f2cdcd
-   Rosewater=#f5e0dc */
+/* Palette: Base=#1e1e2e, Mantle=#181825, Crust=#11111b
+   Surface0=#313244, Surface1=#45475a, Surface2=#585b70
+   Overlay0=#6c7086, Overlay1=#7f849c, Overlay2=#9399b2
+   Text=#cdd6f4, Subtext0=#a6adc8, Subtext1=#bac2de
+   Lavender=#b4befe, Blue=#89b4fa, Sapphire=#74c7ec
+   Sky=#89dceb, Teal=#94e2d5, Green=#a6e3a1
+   Yellow=#f9e2af, Peach=#fab387, Maroon=#eba0ac
+   Red=#f38ba8, Mauve=#cba6f7, Pink=#f5c2e7
+   Flamingo=#f2cdcd, Rosewater=#f5e0dc */
 
 /* ── Reset ── */
 * {
-    font-family: "DankMono Nerd Font", "Symbols Nerd Font", "Font Awesome 6 Free";
+    font-family: "DankMono Nerd Font", "Symbols Nerd Font Mono";
     font-size: 13px;
     font-weight: 500;
     border: none;
@@ -25,7 +27,7 @@ window#waybar {
     color: #cdd6f4;
 }
 
-/* ── Shared Module Style ── */
+/* ── Shared pill style ── */
 #workspaces,
 #window,
 #clock,
@@ -37,23 +39,23 @@ window#waybar {
 #custom-git,
 #custom-ai-status,
 #custom-guix-health,
-#custom-asus-profile,
+#custom-power,
 #mpris,
 #backlight,
 #battery,
 #network,
 #pulseaudio,
 #tray {
-    padding: 4px 14px;
-    margin: 3px 2px;
-    background: alpha(#1e1e2e, 0.85);
+    padding: 3px 12px;
+    margin: 4px 2px;
+    background: alpha(#181825, 0.88);
     color: #cdd6f4;
-    border-radius: 10px;
-    border: 1.5px solid alpha(#585b70, 0.5);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+    border: 1px solid alpha(#45475a, 0.4);
+    transition: all 0.2s ease;
 }
 
-/* ── Hover Glow ── */
+/* ── Hover ── */
 #workspaces:hover,
 #window:hover,
 #clock:hover,
@@ -65,7 +67,7 @@ window#waybar {
 #custom-git:hover,
 #custom-ai-status:hover,
 #custom-guix-health:hover,
-#custom-asus-profile:hover,
+#custom-power:hover,
 #mpris:hover,
 #backlight:hover,
 #battery:hover,
@@ -73,244 +75,214 @@ window#waybar {
 #pulseaudio:hover,
 #tray:hover {
     background: alpha(#313244, 0.95);
-    border-color: alpha(#89b4fa, 0.6);
-    box-shadow: 0 0 12px alpha(#89b4fa, 0.15);
+    border-color: alpha(#89b4fa, 0.5);
 }
 
-/* ── Separators ── */
+/* ── Pipes (thin separators) ── */
 #custom-separator,
-#custom-separator2 {
-    color: alpha(#585b70, 0.5);
-    padding: 0 2px;
+#custom-pipe,
+#custom-pipe2 {
+    color: alpha(#45475a, 0.6);
+    padding: 0 4px;
     margin: 0;
     background: transparent;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 /* ── Workspaces ── */
 #workspaces {
-    padding: 2px 6px;
+    padding: 2px 4px;
+    background: alpha(#11111b, 0.9);
 }
 
 #workspaces button {
-    padding: 2px 10px;
-    color: #585b70;
+    padding: 2px 8px;
+    color: #45475a;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     background: transparent;
-    font-size: 16px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 15px;
+    transition: all 0.2s ease;
 }
 
 #workspaces button:hover {
-    color: #cdd6f4;
-    background: alpha(#585b70, 0.3);
+    color: #bac2de;
+    background: alpha(#45475a, 0.3);
 }
 
 #workspaces button.active {
-    background: linear-gradient(135deg, #89b4fa 0%, #b4befe 100%);
-    color: #1e1e2e;
+    background: linear-gradient(135deg, #89b4fa, #cba6f7);
+    color: #11111b;
     font-weight: bold;
-    box-shadow: 0 0 12px alpha(#89b4fa, 0.5);
-    border-radius: 8px;
-    animation: glow-workspace 2s ease-in-out infinite;
+    border-radius: 10px;
+    box-shadow: 0 0 10px alpha(#89b4fa, 0.4);
 }
 
 #workspaces button.urgent {
-    background: linear-gradient(135deg, #f38ba8 0%, #eba0ac 100%);
-    color: #1e1e2e;
+    background: linear-gradient(135deg, #f38ba8, #fab387);
+    color: #11111b;
     animation: pulse 1.5s ease-in-out infinite;
 }
 
-/* ── Window Title ── */
+/* ── Window ── */
 #window {
-    color: #74c7ec;
+    color: #9399b2;
     font-style: italic;
-    background: alpha(#1e1e2e, 0.6);
-    border-color: alpha(#585b70, 0.3);
+    background: alpha(#181825, 0.5);
+    border-color: transparent;
 }
 
-/* ── Clock ── */
+/* ── Clock (hero module) ── */
 #clock {
-    background: linear-gradient(135deg, alpha(#cba6f7, 0.9) 0%, alpha(#f5c2e7, 0.9) 100%);
-    color: #1e1e2e;
+    background: linear-gradient(135deg, alpha(#cba6f7, 0.85), alpha(#89b4fa, 0.85));
+    color: #11111b;
     font-weight: bold;
     font-size: 14px;
-    padding: 4px 18px;
-    border-color: alpha(#cba6f7, 0.6);
-    box-shadow: 0 0 10px alpha(#cba6f7, 0.2);
-    animation: clock-glow 4s ease-in-out infinite;
+    padding: 3px 20px;
+    border: none;
+    box-shadow: 0 0 12px alpha(#cba6f7, 0.2);
 }
 
 #clock:hover {
     box-shadow: 0 0 20px alpha(#cba6f7, 0.5);
-    border-color: alpha(#f5c2e7, 0.8);
 }
 
-/* ── Emacs Status ── */
+/* ── Dev modules ── */
 #custom-emacs {
     color: #cba6f7;
-    border-bottom: 2px solid alpha(#cba6f7, 0.4);
+    border-left: 2px solid alpha(#cba6f7, 0.5);
+    border-radius: 2px 12px 12px 2px;
 }
 
-/* ── Git Status ── */
 #custom-git {
     color: #fab387;
-    border-bottom: 2px solid alpha(#fab387, 0.4);
+    border-left: 2px solid alpha(#fab387, 0.5);
+    border-radius: 2px 12px 12px 2px;
 }
 
 #custom-git.dirty {
     color: #f9e2af;
-    border-bottom-color: alpha(#f9e2af, 0.6);
+    border-left-color: alpha(#f9e2af, 0.7);
 }
 
 #custom-git.clean {
     color: #a6e3a1;
-    border-bottom-color: alpha(#a6e3a1, 0.4);
+    border-left-color: alpha(#a6e3a1, 0.5);
 }
 
-/* ── System Monitors ── */
-#cpu {
-    color: #fab387;
-    border-bottom: 2px solid alpha(#fab387, 0.4);
-}
-
-#memory {
-    color: #f5c2e7;
-    border-bottom: 2px solid alpha(#f5c2e7, 0.4);
-}
-
-#temperature {
-    color: #a6e3a1;
-    border-bottom: 2px solid alpha(#a6e3a1, 0.4);
-}
-
-#temperature.critical {
-    background: linear-gradient(135deg, #f38ba8 0%, #eba0ac 100%);
-    color: #1e1e2e;
-    animation: pulse 1s ease-in-out infinite;
-}
-
-#custom-gpu {
-    color: #94e2d5;
-    border-bottom: 2px solid alpha(#94e2d5, 0.4);
-}
-
-/* ── AI Status ── */
 #custom-ai-status {
     color: #f5c2e7;
-    border-bottom: 2px solid alpha(#f5c2e7, 0.4);
+    border-left: 2px solid alpha(#f5c2e7, 0.5);
+    border-radius: 2px 12px 12px 2px;
 }
 
 #custom-ai-status.active {
     color: #a6e3a1;
-    border-bottom-color: alpha(#a6e3a1, 0.6);
+    border-left-color: alpha(#a6e3a1, 0.7);
     animation: pulse 2s ease-in-out infinite;
 }
 
-/* ── Guix Health ── */
+/* ── System ── */
+#cpu { color: #fab387; }
+#cpu.high { color: #f38ba8; }
+#cpu.critical {
+    color: #11111b;
+    background: linear-gradient(135deg, #f38ba8, #eba0ac);
+}
+
+#memory { color: #f5c2e7; }
+#memory.high { color: #fab387; }
+#memory.critical {
+    color: #11111b;
+    background: linear-gradient(135deg, #f38ba8, #eba0ac);
+}
+
+#temperature { color: #94e2d5; }
+#temperature.critical {
+    color: #11111b;
+    background: linear-gradient(135deg, #f38ba8, #eba0ac);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+#custom-gpu { color: #89dceb; }
+
+/* ── Guix ── */
 #custom-guix-health {
     color: #89b4fa;
-    border-bottom: 2px solid alpha(#89b4fa, 0.4);
+    border-left: 2px solid alpha(#89b4fa, 0.5);
+    border-radius: 2px 12px 12px 2px;
 }
 
 #custom-guix-health.warning {
     color: #f9e2af;
-    border-bottom-color: alpha(#f9e2af, 0.6);
-    animation: pulse 3s ease-in-out infinite;
-}
-
-/* ── ASUS Profile ── */
-#custom-asus-profile {
-    color: #74c7ec;
-    font-size: 13px;
-}
-
-#custom-asus-profile.performance {
-    color: #f38ba8;
-    border-bottom: 2px solid alpha(#f38ba8, 0.4);
-}
-
-#custom-asus-profile.balanced {
-    color: #f9e2af;
-    border-bottom: 2px solid alpha(#f9e2af, 0.4);
-}
-
-#custom-asus-profile.quiet {
-    color: #a6e3a1;
-    border-bottom: 2px solid alpha(#a6e3a1, 0.4);
+    border-left-color: alpha(#f9e2af, 0.7);
 }
 
 /* ── Media ── */
 #mpris {
     color: #a6e3a1;
     font-style: italic;
-    background: alpha(#1e1e2e, 0.7);
-    border-color: alpha(#a6e3a1, 0.3);
-}
-
-#mpris:hover {
-    border-color: alpha(#a6e3a1, 0.6);
-    box-shadow: 0 0 12px alpha(#a6e3a1, 0.15);
+    background: alpha(#181825, 0.6);
+    border-color: transparent;
 }
 
 /* ── Controls ── */
-#backlight {
-    color: #f9e2af;
-}
+#backlight { color: #f9e2af; }
 
-#pulseaudio {
-    color: #f5c2e7;
-}
-
+#pulseaudio { color: #f5c2e7; }
 #pulseaudio.muted {
-    color: #585b70;
-    background: alpha(#1e1e2e, 0.6);
+    color: #45475a;
+    background: alpha(#181825, 0.5);
 }
 
-/* ── Network ── */
-#network {
-    color: #74c7ec;
-}
-
+#network { color: #89dceb; }
 #network.disconnected {
     color: #f38ba8;
-    background: alpha(#302030, 0.8);
-    border-color: alpha(#f38ba8, 0.4);
+    background: alpha(#181825, 0.9);
+    border-color: alpha(#f38ba8, 0.3);
 }
 
 /* ── Battery ── */
-#battery {
-    color: #f9e2af;
-}
+#battery { color: #a6e3a1; }
 
 #battery.charging {
-    color: #1e1e2e;
-    background: linear-gradient(135deg, alpha(#a6e3a1, 0.9) 0%, alpha(#94e2d5, 0.9) 100%);
-    border-color: alpha(#a6e3a1, 0.6);
+    color: #11111b;
+    background: linear-gradient(135deg, alpha(#a6e3a1, 0.85), alpha(#94e2d5, 0.85));
+    border: none;
 }
 
 #battery.warning:not(.charging) {
-    color: #1e1e2e;
-    background: linear-gradient(135deg, #fab387 0%, #f9e2af 100%);
+    color: #11111b;
+    background: linear-gradient(135deg, #fab387, #f9e2af);
     animation: pulse 2s ease-in-out infinite;
 }
 
 #battery.critical:not(.charging) {
-    color: #1e1e2e;
-    background: linear-gradient(135deg, #f38ba8 0%, #eba0ac 100%);
+    color: #11111b;
+    background: linear-gradient(135deg, #f38ba8, #eba0ac);
     animation: pulse 1s ease-in-out infinite;
+}
+
+/* ── Power button ── */
+#custom-power {
+    color: #f38ba8;
+    padding: 3px 10px;
+    font-size: 15px;
+    background: alpha(#181825, 0.6);
+    border-color: alpha(#f38ba8, 0.3);
+}
+
+#custom-power:hover {
+    background: alpha(#f38ba8, 0.2);
+    border-color: alpha(#f38ba8, 0.6);
 }
 
 /* ── Tray ── */
 #tray {
-    padding: 4px 10px;
+    padding: 3px 8px;
 }
 
-#tray > .passive {
-    opacity: 0.5;
-}
-
+#tray > .passive { opacity: 0.5; }
 #tray > .needs-attention {
     background: alpha(#f38ba8, 0.8);
     animation: pulse 1s ease-in-out infinite;
@@ -319,32 +291,20 @@ window#waybar {
 /* ── Animations ── */
 @keyframes pulse {
     0%   { opacity: 1.0; }
-    50%  { opacity: 0.6; }
+    50%  { opacity: 0.55; }
     100% { opacity: 1.0; }
-}
-
-@keyframes glow-workspace {
-    0%   { box-shadow: 0 0 8px alpha(#89b4fa, 0.3); }
-    50%  { box-shadow: 0 0 16px alpha(#89b4fa, 0.6); }
-    100% { box-shadow: 0 0 8px alpha(#89b4fa, 0.3); }
-}
-
-@keyframes clock-glow {
-    0%   { box-shadow: 0 0 8px alpha(#cba6f7, 0.15); }
-    50%  { box-shadow: 0 0 14px alpha(#cba6f7, 0.35); }
-    100% { box-shadow: 0 0 8px alpha(#cba6f7, 0.15); }
 }
 
 /* ── Tooltip ── */
 tooltip {
-    background: alpha(#1e1e2e, 0.95);
-    border: 1.5px solid alpha(#89b4fa, 0.5);
-    border-radius: 10px;
-    padding: 8px 12px;
+    background: alpha(#11111b, 0.95);
+    border: 1px solid alpha(#89b4fa, 0.4);
+    border-radius: 12px;
+    padding: 8px 14px;
 }
 
 tooltip label {
     color: #cdd6f4;
     font-family: "DankMono Nerd Font";
-    font-size: 13px;
+    font-size: 12px;
 }

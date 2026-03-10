@@ -1,22 +1,22 @@
 {
     "layer": "top",
     "position": "top",
-    "height": 44,
-    "margin-top": 8,
-    "margin-left": 12,
-    "margin-right": 12,
-    "spacing": 4,
+    "height": 40,
+    "margin-top": 6,
+    "margin-left": 10,
+    "margin-right": 10,
+    "spacing": 0,
 
-    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-left": ["hyprland/workspaces", "custom/separator", "hyprland/window"],
     "modules-center": ["clock"],
-    "modules-right": ["custom/emacs", "custom/git", "custom/ai-status", "mpris", "custom/separator", "custom/guix-health", "custom/gpu", "cpu", "memory", "temperature", "custom/separator2", "custom/asus-profile", "backlight", "pulseaudio", "network", "battery", "tray"],
+    "modules-right": ["custom/emacs", "custom/git", "custom/ai-status", "mpris", "custom/pipe", "custom/guix-health", "custom/gpu", "cpu", "memory", "temperature", "custom/pipe2", "backlight", "pulseaudio", "network", "battery", "custom/power", "tray"],
 
     "hyprland/workspaces": {
         "format": "{icon}",
         "format-icons": {
             "1": "",
             "2": "󰈹",
-            "3": "󰙯",
+            "3": "",
             "4": "󰎁",
             "5": "",
             "6": "",
@@ -24,7 +24,8 @@
             "8": "",
             "9": "",
             "active": "",
-            "default": ""
+            "default": "",
+            "urgent": ""
         },
         "persistent-workspaces": { "*": 5 },
         "sort-by-number": true,
@@ -34,34 +35,61 @@
 
     "hyprland/window": {
         "format": "{}",
-        "max-length": 40,
-        "separate-outputs": true
+        "max-length": 35,
+        "separate-outputs": true,
+        "rewrite": {
+            "(.*) — Mozilla Firefox": "󰈹 $1",
+            "(.*) - foot": " $1",
+            "(.*) - kitty": " $1",
+            "emacs(.*)": " emacs$1",
+            "": " desktop"
+        }
     },
 
     "clock": {
-        "format": " {:%I:%M %p}",
-        "format-alt": " {:%A, %B %d}",
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+        "format": "  {:%H:%M}",
+        "format-alt": "  {:%A, %d %B %Y}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "calendar": {
+            "mode": "month",
+            "weeks-pos": "left",
+            "format": {
+                "months": "<span color='#cba6f7'><b>{}</b></span>",
+                "days": "<span color='#cdd6f4'>{}</span>",
+                "weeks": "<span color='#585b70'>W{}</span>",
+                "weekdays": "<span color='#f9e2af'><b>{}</b></span>",
+                "today": "<span color='#f38ba8'><b><u>{}</u></b></span>"
+            }
+        }
     },
 
     "cpu": {
-        "format": " {usage}%",
-        "interval": 5,
-        "tooltip-format": "CPU: {usage}%\n{avg_frequency} GHz"
+        "format": "  {usage}%",
+        "interval": 3,
+        "tooltip-format": "CPU: {usage}%\n{avg_frequency} GHz",
+        "states": {
+            "high": 70,
+            "critical": 90
+        }
     },
 
     "memory": {
-        "format": " {percentage}%",
+        "format": "  {percentage}%",
         "interval": 5,
-        "tooltip-format": "RAM: {used:0.1f}G / {total:0.1f}G"
+        "tooltip-format": "RAM: {used:0.1f}G / {total:0.1f}G\nSwap: {swapUsed:0.1f}G / {swapTotal:0.1f}G",
+        "states": {
+            "high": 70,
+            "critical": 90
+        }
     },
 
     "temperature": {
         "critical-threshold": 85,
         "format": " {temperatureC}°",
+        "format-critical": " {temperatureC}°",
         "hwmon-path-abs": "/sys/devices/pci0000:00/0000:00:18.3/hwmon",
         "input-filename": "temp1_input",
-        "interval": 5
+        "interval": 3
     },
 
     "custom/gpu": {
@@ -73,60 +101,70 @@
     },
 
     "mpris": {
-        "format": "{player_icon} {title}",
-        "format-paused": "{player_icon} <i>{title}</i>",
-        "max-length": 25,
+        "format": "{player_icon}  {title}",
+        "format-paused": "{player_icon}  <i>{title}</i>",
+        "max-length": 20,
         "player-icons": {
-            "default": "▶",
+            "default": "",
             "firefox": "󰈹",
-            "mpv": "󰎁"
-        }
+            "mpv": "󰎁",
+            "spotify": ""
+        },
+        "on-click": "playerctl play-pause"
     },
 
     "backlight": {
-        "format": "{icon} {percent}%",
+        "format": "{icon}  {percent}%",
         "format-icons": ["󰃞", "󰃟", "󰃠"],
-        "tooltip-format": "Brightness: {percent}%"
+        "tooltip-format": "Brightness: {percent}%",
+        "on-scroll-up": "brightnessctl set 5%+",
+        "on-scroll-down": "brightnessctl set 5%-"
     },
 
     "battery": {
-        "format": "{icon} {capacity}%",
-        "format-charging": "󰂄 {capacity}%",
-        "format-plugged": "󰚥 {capacity}%",
+        "format": "{icon}  {capacity}%",
+        "format-charging": "󰂄  {capacity}%",
+        "format-plugged": "󰚥  {capacity}%",
+        "format-full": "󰁹  Full",
         "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
         "states": {
-            "warning": 30,
-            "critical": 15
+            "warning": 25,
+            "critical": 10
         },
-        "tooltip-format": "{timeTo}\nPower: {power}W"
+        "tooltip-format": "{timeTo}\nPower: {power:.1f}W\nCycles: {cycles}"
     },
 
     "network": {
-        "format-wifi": "󰤨 {essid}",
-        "format-ethernet": "󰈀 {ifname}",
-        "format-disconnected": "󰤭",
-        "tooltip-format": "{ifname}: {ipaddr}/{cidr}\n  {bandwidthUpBits}\n  {bandwidthDownBits}",
-        "interval": 2
+        "format-wifi": "󰤨  {essid}",
+        "format-ethernet": "󰈀  {ifname}",
+        "format-disconnected": "󰤭  Off",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ifname}: {ipaddr}/{cidr}\n {bandwidthUpBits}  {bandwidthDownBits}",
+        "tooltip-format-ethernet": "{ifname}: {ipaddr}/{cidr}\n {bandwidthUpBits}  {bandwidthDownBits}",
+        "interval": 3,
+        "on-click": "foot -a floating -e nmtui"
     },
 
     "pulseaudio": {
-        "format": "{icon} {volume}%",
-        "format-muted": "󰖁",
+        "format": "{icon}  {volume}%",
+        "format-muted": "󰖁  Mute",
         "format-icons": {
             "default": ["󰕿", "󰖀", "󰕾"],
             "headphone": "󰋋"
         },
-        "on-click": "pavucontrol"
+        "on-click": "pavucontrol",
+        "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%+",
+        "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-"
     },
 
     "tray": {
-        "icon-size": 16,
-        "spacing": 6
+        "icon-size": 15,
+        "spacing": 8
     },
 
     "custom/emacs": {
         "exec": "emacsclient --eval '(my/waybar-status)' 2>/dev/null | tr -d '\"' || echo ''",
-        "format": " {}",
+        "format": "  {}",
         "interval": 5,
         "tooltip": false,
         "on-click": "emacsclient -c -a emacs"
@@ -159,23 +197,26 @@
         "on-click": "~/.local/bin/guix-menu"
     },
 
-    "custom/asus-profile": {
-        "exec": "~/.local/bin/asus-waybar-status",
-        "format": "{}",
-        "interval": 5,
-        "return-type": "json",
-        "tooltip": true,
-        "on-click": "asusctl profile next"
+    "custom/power": {
+        "format": "⏻",
+        "tooltip": false,
+        "on-click": "~/.local/bin/power-menu"
     },
 
     "custom/separator": {
-        "format": "│",
+        "format": "",
         "interval": "once",
         "tooltip": false
     },
 
-    "custom/separator2": {
-        "format": "│",
+    "custom/pipe": {
+        "format": "",
+        "interval": "once",
+        "tooltip": false
+    },
+
+    "custom/pipe2": {
+        "format": "",
         "interval": "once",
         "tooltip": false
     }
